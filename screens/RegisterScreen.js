@@ -25,14 +25,13 @@ const RegisterScreen = () => {
   const handleRegister = () => {
     const user = {
       name: name,
-      email,
-      email,
+      email: email,
       password: password,
     };
     axios
-      .post("http://localhost:3000/register", user)
+      .post("http://10.0.2.2:3000/register", user)
       .then((response) => {
-        console.log(reponse);
+        console.log(response);
         Alert.alert(
           "Registration succesfull",
           "you have been registereed successfully"
@@ -46,7 +45,7 @@ const RegisterScreen = () => {
           "registration failed",
           "An error occured during registration"
         );
-        console.log("error", error);
+        console.log("error", error.response?.data || error.message);
       });
   };
   return (
@@ -74,7 +73,7 @@ const RegisterScreen = () => {
                 gap: 5,
                 borderColor: "#D0D0D0",
                 borderWidth: 1,
-                PaddingVertical: 5,
+                paddingVertical: 5,
                 borderRadius: 5,
               }}
             >

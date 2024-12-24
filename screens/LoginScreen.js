@@ -7,16 +7,37 @@ import {
   Image,
   Pressable,
   TextInput,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  const handleLogin = () => {
+    const user = {
+      email: email,
+      password: password,
+    };
+    axios
+      .post("http:/10.0.2.2:3000/login", user)
+      .then((response) => {
+        console.log(response);
+        const token = response.data.token;
+        AsyncStorage.setItem("authToken", token);
+        navigation.navigate("Home");
+      })
+      .catch((error) => {
+        Alert.alert("Login error");
+        console.log("error", error);
+      });
+  };
   return (
     <SafeAreaView
       style={{ flex: 1, backfaceVisibility: "white", alignItems: "center" }}
@@ -117,6 +138,7 @@ const LoginScreen = () => {
         </View>
         <View style={{ marginTop: 45 }} />
         <Pressable
+          onPress={handleLogin}
           style={{
             width: 200,
             backgroundColor: "black",

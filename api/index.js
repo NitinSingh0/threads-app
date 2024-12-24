@@ -35,7 +35,7 @@ const User = require("./models/user");
 const Post = require("./models/post");
 
 //endpoint to register a user in the backend
-app.post("/register", async (requestAnimationFrame, res) => {
+app.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
     const existingUser = await User.findOne({ email });
@@ -47,7 +47,7 @@ app.post("/register", async (requestAnimationFrame, res) => {
     const newUser = new User({ name, email, password });
 
     //generate and store the verification token
-    newUser.verifactionToken = crypto.randomBytes(20).toString("hex");
+    newUser.verificationToken = crypto.randomBytes(20).toString("hex");
 
     //sace the user to the database
     await newUser.save();
@@ -63,7 +63,7 @@ app.post("/register", async (requestAnimationFrame, res) => {
 const sendVerificationEmail = async (email, verificationToken) => {
   //create a nodemailer transporter
   const transporter = nodemailer.createTransport({
-    service: "gamil",
+    service: "gmail",
     auth: {
       user: "itinventrix@gmail.com",
       pass: "kncj yjzx fcfa mqhh",
@@ -74,14 +74,14 @@ const sendVerificationEmail = async (email, verificationToken) => {
     from: "threads.com",
     to: email,
     subject: "Email Verification",
-    text: "please click the following link to verify your email http://localhost:3000/verify/${verificationToken}",
+    text: `please click the following link to verify your email http://localhost:3000/verify/${verificationToken}`,
   };
   try {
     await transporter.sendMail(mailOption);
   } catch (error) {
     console.log("error sensing email", error);
   }
-}
+};
 app.get("/verify/:token", async (req, res) => {
   try {
     const token = req.params.token;
@@ -92,19 +92,18 @@ app.get("/verify/:token", async (req, res) => {
     }
 
     user.verified = true;
-    user.verificationtoken = undefined;
+    user.verificationToken = undefined;
     await user.save();
-
   } catch (error) {
     console.log("error getting token", error);
-    res.status(500).json({ message: "Email verification failed" })
+    res.status(500).json({ message: "Email verification failed" });
   }
 });
 
 const generateSecretKey = () => {
   const secretKey = crypto.randomBytes(32).toString("hex");
   return secretKey;
-}
+};
 const secretKey = generateSecretKey();
 
 app.post("/login", async (req, res) => {
@@ -112,16 +111,14 @@ app.post("/login", async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({message:"Invallid email or password"})
+      return res.status(404).json({ message: "Invallid email or password" });
     }
     if (user.password != password) {
-      return res.status(404).json({message:"Invalid email or password"})
+      return res.status(404).json({ message: "Invalid email or password" });
     }
     const token = jwt.sign({ userId: user._id }, secretKey);
+    res.status(200).json({ token, message: "Login successful" });
+  } catch (error) {
     res.status(500).json({ message: "Login failed" });
   }
-    catch (error) {
-    res.status(500).json({ message: "Login failed" });
-    }
-  
-})
+});
