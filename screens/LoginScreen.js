@@ -9,7 +9,7 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
@@ -20,6 +20,21 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  useEffect(() => {
+    const checkLoginstatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (token) {
+          setTimeout(() => {
+            navigation.replace("Main");
+          }, 400);
+        }
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    checkLoginstatus();
+  }, []);
   const handleLogin = () => {
     const user = {
       email: email,

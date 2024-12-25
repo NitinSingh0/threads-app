@@ -3957,6 +3957,11 @@ jsonfile@^6.0.1:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
+jwt-decode@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/jwt-decode/-/jwt-decode-4.0.0.tgz"
+  integrity sha512-+KJGIyHgkGuIq3IEBNftfhW/LfWhXUIY6OmyVWjliu5KH1y0fw7VQ8YndE2O4qZdMSd9SqbnC8GOcZEy0Om7sA==
+
 kind-of@^6.0.2:
   version "6.0.3"
   resolved "https://registry.npmjs.org/kind-of/-/kind-of-6.0.3.tgz"
@@ -5044,7 +5049,7 @@ react-native-vector-icons@^10.2.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", react-native@0.76.5:
+react-native@*, "react-native@^0.0.0-0 || >=0.65 <1.0", react-native@^0.76.5:
   version "0.76.5"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.76.5.tgz"
   integrity sha512-op2p2kB+lqMF1D7AdX4+wvaR0OPFbvWYs+VBE7bwsb99Cn9xISrLRLAgFflZedQsa5HvnOGrULhtnmItbIKVVw==
