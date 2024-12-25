@@ -122,3 +122,19 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Login failed" });
   }
 });
+
+//enspoint to accepet all the user except the loggen in user
+
+app.get("/user/:userId", (req, res) => {
+  try {
+    const loggedInUSerId = req.params.userId;
+    User.find({ _id: { $ne: loggedInUSerId } }).then((users)=> {
+      res.status(200).json(users);
+    }).catch((error) => {
+      console.log("Error : ", error);
+      res.status(500).json("error");
+    })
+  } catch (error) {
+    res.status(500).json({message: "error getting user"})
+  }
+})
