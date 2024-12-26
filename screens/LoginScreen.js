@@ -46,7 +46,7 @@ const LoginScreen = () => {
         console.log(response);
         const token = response.data.token;
         AsyncStorage.setItem("authToken", token);
-        navigation.navigate("Home");
+        navigation.navigate("Main");
       })
       .catch((error) => {
         Alert.alert("Login error");

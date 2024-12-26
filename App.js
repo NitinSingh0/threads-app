@@ -5,12 +5,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { UserContext } from './UserContext';
 
 export default function App() {
-  return
-  <UserContext>
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <StackNavigator />
-    </GestureHandlerRootView>
-  </UserContext>;
+  return (
+    <UserContext>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <StackNavigator />
+      </GestureHandlerRootView>
+    </UserContext>
+  );
 }
 
 const styles = StyleSheet.create({
