@@ -25,24 +25,29 @@ const User = ({ item }) => {
 
   const handleUnfollow = async (targetId) => {
     try {
-      const response = await fetch("http://10.0.2.2:3000//users/unfollow", {
+      const response = await fetch("http://10.0.2.2:3000/users/unfollow", {
+        // Removed extra '/'
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          loggedInUserId: userId,
+          loggedInUserId: userId, // Correct property name
           targetUserId: targetId,
         }),
       });
       if (response.ok) {
         setRequestSent(false);
-        console.log("unfollowed successfully");
+        console.log("Unfollowed successfully");
+      } else {
+        const errorData = await response.json();
+        console.log("Error:", errorData.message);
       }
     } catch (error) {
-      console.log("Error", error);
+      console.log("Error:", error);
     }
   };
+
 
   return (
     <View>
