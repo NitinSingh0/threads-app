@@ -10,10 +10,29 @@ import React, { useContext, useState } from "react";
 import { TextInput } from "react-native-gesture-handler";
 import { UserType } from "../UserContext";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 const ThreadsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
   const [content, setContent] = useState("");
+  const fetchUsers = async () => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        console.error("Auth token not found");
+        return;
+      }
+
+      const decodeToken = jwtDecode(token);
+      const userId = decodeToken.userId;
+      setUserId(userId);
+    } catch (error) {
+      console.error("Error fetching usersId:", error);
+    }
+  };
+
+  fetchUsers();
   const handlePostSubmit = () => {
     const postData = {
       userId: userId,

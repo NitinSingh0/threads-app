@@ -123,7 +123,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-//enspoint to accepet all the user except the loggen in user
+//end point to accepet all the user except the loggen in user
 
 app.get("/user/:userId", (req, res) => {
   try {
@@ -252,3 +252,16 @@ app.get("/get-posts", async (req, res) => {
     res.status(500).json({ messsage: "An error occured while fetching post" });
   }
 });
+
+app.get("/profile/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404)._construct({message:"User not found"})
+    }
+    return res.status(200).json({user})
+  } catch (error) {
+    res.status(500).json({mesasge:"Error while getting the profile"})
+  }
+})
