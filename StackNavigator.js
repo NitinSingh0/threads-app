@@ -6,88 +6,116 @@ import RegisterScreen from "./screens/RegisterScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./screens/HomeScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Entypo from '@expo/vector-icons/Entypo';
+import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import ThreadsScreen from "./screens/ThreadsScreen";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivityScreen from "./screens/ActivityScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 
+// Add animation for stack transitions
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
+
   function BottomTabs() {
     return (
-      <Tab.Navigator>
+      <Tab.Navigator
+        screenOptions={{
+          tabBarStyle: {
+            backgroundColor: "#F2F2F2",
+            borderTopWidth: 0,
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOpacity: 0.1,
+            shadowRadius: 10,
+            shadowOffset: { width: 0, height: -5 },
+          },
+        }}
+      >
         <Tab.Screen
           name="Home"
           component={HomeScreen}
           options={{
             tabBarLabel: "Home",
-            tabBarLabelStyle: { color: "black" },
+            tabBarLabelStyle: { color: "black", fontSize: 12 },
             headerShown: false,
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <Entypo name="home" size={24} color="black" />
-              ) : (
-                <AntDesign name="home" size={24} color="black" />
-              ),
+            tabBarIcon: ({ focused }) => (
+              <Entypo
+                name={focused ? "home" : "home-outline"}
+                size={24}
+                color={focused ? "#4F91F3" : "gray"}
+              />
+            ),
           }}
         />
-
         <Tab.Screen
           name="Thread"
           component={ThreadsScreen}
           options={{
             tabBarLabel: "Thread",
-            tabBarLabelStyle: { color: "black" },
+            tabBarLabelStyle: { color: "black", fontSize: 12 },
             headerShown: false,
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <Ionicons name="create" size={24} color="black" />
-              ) : (
-                <Ionicons name="create-outline" size={24} color="black" />
-              ),
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "create" : "create-outline"}
+                size={24}
+                color={focused ? "#4F91F3" : "gray"}
+              />
+            ),
           }}
         />
-
         <Tab.Screen
           name="Activity"
           component={ActivityScreen}
           options={{
             tabBarLabel: "Activity",
-            tabBarLabelStyle: { color: "black" },
+            tabBarLabelStyle: { color: "black", fontSize: 12 },
             headerShown: false,
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <AntDesign name="heart" size={24} color="black" />
-              ) : (
-                <AntDesign name="hearto" size={24} color="black" />
-              ),
+            tabBarIcon: ({ focused }) => (
+              <AntDesign
+                name={focused ? "heart" : "hearto"}
+                size={24}
+                color={focused ? "#4F91F3" : "gray"}
+              />
+            ),
           }}
         />
-
         <Tab.Screen
           name="Profile"
           component={ProfileScreen}
           options={{
             tabBarLabel: "Profile",
-            tabBarLabelStyle: { color: "black" },
+            tabBarLabelStyle: { color: "black", fontSize: 12 },
             headerShown: false,
-            tabBarIcon: ({ focused }) =>
-              focused ? (
-                <Ionicons name="person" size={24} color="black" />
-              ) : (
-                <Ionicons name="person-outline" size={24} color="black" />
-              ),
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                size={24}
+                color={focused ? "#4F91F3" : "gray"}
+              />
+            ),
           }}
         />
       </Tab.Navigator>
     );
   }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: "#4F91F3",
+          },
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontSize: 20,
+          },
+          animation: "fade_from_bottom", // Add animation when navigating between screens
+        }}
+      >
         <Stack.Screen
           name="Login"
           component={LoginScreen}
@@ -110,4 +138,7 @@ const StackNavigator = () => {
 
 export default StackNavigator;
 
-//const styles = StyleSheet.create({});
+// You can add your styles here, if necessary
+const styles = StyleSheet.create({
+  // Add custom styles here if needed
+});

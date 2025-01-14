@@ -7,16 +7,17 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwt_decode, { jwtDecode } from "jwt-decode";
-
+import jwtDecode from "jwt-decode";
 import axios from "axios";
 import { UserType } from "../UserContext";
 import User from "../components/User";
 
 const ActivityScreen = () => {
   const [selectedButton, setSelectedButton] = useState("people");
+  const jwtDecode = require("jwt-decode");
+
   const [users, setUsers] = useState([]);
-  const { setUserId } = useContext(UserType); // Ensure this is correctly set up in UserContext
+  const { setUserId } = useContext(UserType);
 
   const handleButtonClick = (buttonName) => {
     setSelectedButton(buttonName);
@@ -46,8 +47,8 @@ const ActivityScreen = () => {
   }, [setUserId]);
 
   return (
-    <ScrollView style={{ marginTop: 50 }}>
-      <View style={{ padding: 10 }}>
+    <ScrollView style={styles.container}>
+      <View style={styles.content}>
         <Text style={styles.title}>Activity</Text>
 
         <View style={styles.buttonGroup}>
@@ -74,18 +75,15 @@ const ActivityScreen = () => {
 
         <View>
           {selectedButton === "people" && (
-           
-            <View style={{ marginTop: 20 }}>
-              
-              {users?.map((item, index) => (
-                <User key={index} item={item} />    
-              ))}
-              </View>
-              
+            <View style={styles.userList}>
+              {users?.length > 0 ? (
+                users.map((item, index) => <User key={index} item={item} />)
+              ) : (
+                <Text style={styles.noDataText}>No users found.</Text>
+              )}
+            </View>
           )}
         </View>
-
-        
       </View>
     </ScrollView>
   );
@@ -94,44 +92,59 @@ const ActivityScreen = () => {
 export default ActivityScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+  },
+  content: {
+    padding: 15,
+  },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
+    color: "#212529",
+    marginBottom: 20,
   },
   buttonGroup: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 12,
+    justifyContent: "space-between",
+    marginBottom: 20,
   },
   button: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: "white",
-    borderColor: "#D0D0D0",
-    borderRadius: 6,
-    borderWidth: 0.7,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    marginHorizontal: 5,
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ced4da",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   selectedButton: {
-    backgroundColor: "black",
+    backgroundColor: "#343a40",
+    borderColor: "#343a40",
   },
   buttonText: {
     textAlign: "center",
-    fontWeight: "bold",
-    color: "black",
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#495057",
   },
   selectedButtonText: {
-    color: "white",
+    color: "#ffffff",
   },
-  userItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#D0D0D0",
+  userList: {
+    marginTop: 15,
   },
   noDataText: {
     textAlign: "center",
+    fontSize: 16,
+    color: "#6c757d",
     marginTop: 20,
-    color: "#888",
   },
 });

@@ -24,6 +24,7 @@ const HomeScreen = () => {
   const [userId, setLocalUserId] = useState(null);
   const [posts, setPosts] = useState([]);
   const [likeScale] = useState(new Animated.Value(1)); // Animation for like button
+const jwtDecode = require("jwt-decode");
 
   const handleLogout = async () => {
     try {

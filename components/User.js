@@ -48,73 +48,30 @@ const User = ({ item }) => {
     }
   };
 
-
   return (
     <View>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+      <View style={styles.container}>
         <Image
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            resizeMode: "contain",
-          }}
+          style={styles.profileImage}
           source={{
             uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
           }}
         />
-        <Text
-          style={{
-            fontSize: 15,
-            fontWeight: "500",
-            flex: 1,
-          }}
-        >
-          {item?.name}
-        </Text>
+        <Text style={styles.name}>{item?.name}</Text>
+
         {requestSent || item?.followers?.includes(userId) ? (
           <Pressable
             onPress={() => handleUnfollow(item?._id)}
-            style={{
-              borderColor: "#D0D0D0",
-              borderWidth: 1,
-              padding: 10,
-              marginLeft: 10,
-              width: 100,
-              borderRadius: 7,
-            }}
+            style={styles.followButton}
           >
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 15,
-                fontWeight: "bold",
-              }}
-            >
-              following
-            </Text>
+            <Text style={styles.followButtonText}>Following</Text>
           </Pressable>
         ) : (
           <Pressable
             onPress={() => sendFollow(userId, item._id)}
-            style={{
-              borderColor: "#D0D0D0",
-              borderWidth: 1,
-              padding: 10,
-              marginLeft: 10,
-              width: 100,
-              borderRadius: 7,
-            }}
+            style={styles.followButton}
           >
-            <Text
-              style={{
-                textAlign: "center",
-                fontSize: 15,
-                fontWeight: "bold",
-              }}
-            >
-              Follow
-            </Text>
+            <Text style={styles.followButtonText}>Follow</Text>
           </Pressable>
         )}
       </View>
@@ -124,4 +81,45 @@ const User = ({ item }) => {
 
 export default User;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E0E0E0",
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    resizeMode: "contain",
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: "500",
+    flex: 1,
+    color: "#333",
+  },
+  followButton: {
+    borderColor: "#D0D0D0",
+    borderWidth: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    marginLeft: 10,
+    width: 100,
+    borderRadius: 7,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  followButtonText: {
+    textAlign: "center",
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#333",
+  },
+});
+

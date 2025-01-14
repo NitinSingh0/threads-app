@@ -5,17 +5,19 @@ import {
   View,
   SafeAreaView,
   Button,
+  TextInput,
 } from "react-native";
 import React, { useContext, useState } from "react";
-import { TextInput } from "react-native-gesture-handler";
 import { UserType } from "../UserContext";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { jwtDecode } from "jwt-decode";
+import jwtDecode from "jwt-decode";
 
 const ThreadsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
   const [content, setContent] = useState("");
+  const jwtDecode = require("jwt-decode");
+
   const fetchUsers = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
@@ -24,20 +26,20 @@ const ThreadsScreen = () => {
         return;
       }
 
-      const decodeToken = jwtDecode(token);
-      const userId = decodeToken.userId;
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.userId;
       setUserId(userId);
     } catch (error) {
-      console.error("Error fetching usersId:", error);
+      console.error("Error fetching userId:", error);
     }
   };
 
   fetchUsers();
+
   const handlePostSubmit = () => {
     const postData = {
       userId: userId,
     };
-    console.log(postData);
     if (content) {
       postData.content = content;
     }
@@ -54,44 +56,71 @@ const ThreadsScreen = () => {
         );
       });
   };
+
   return (
-    <SafeAreaView style={{ padding: 10 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-          padding: 10,
-        }}
-      >
+    <SafeAreaView style={styles.container}>
+      <View style={styles.profileSection}>
         <Image
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            resizeMode: "contain",
-          }}
+          style={styles.profileImage}
           source={{
             uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
           }}
         />
-        <Text>Nitin_Singh</Text>
+        <Text style={styles.profileName}>Nitin_Singh</Text>
       </View>
-      <View style={{ flexDirection: "row", marginLeft: 10 }}>
+      <View style={styles.inputContainer}>
         <TextInput
+          style={styles.input}
           value={content}
           onChangeText={(text) => setContent(text)}
-          placeholderTextColor={"black"}
           placeholder="Type your message... "
+          placeholderTextColor={"gray"}
           multiline
         />
       </View>
-      <View style={{ marginTop: 20 }} />
-      <Button onPress={handlePostSubmit} title="Share Post" />
+      <Button onPress={handlePostSubmit} title="Share Post" color="#007AFF" />
     </SafeAreaView>
   );
 };
 
 export default ThreadsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: "#f8f9fa",
+  },
+  profileSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+    padding: 10,
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    resizeMode: "cover",
+    marginRight: 10,
+  },
+  profileName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#343a40",
+  },
+  inputContainer: {
+    marginBottom: 20,
+    padding: 10,
+    borderColor: "#ced4da",
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: "#fff",
+  },
+  input: {
+    fontSize: 16,
+    color: "#495057",
+    textAlignVertical: "top",
+    minHeight: 100,
+  },
+});
