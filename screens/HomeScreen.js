@@ -139,16 +139,16 @@ const HomeScreen = () => {
 
     try {
       const response = await axios.post(
-        "https://api.openai.com/v1/completions",
+        "https://api.openai.com/v1/chat/completions",
         {
-          model: "text-davinci-003",
+          model: "gpt-4o-mini",
           prompt: userMessage,
           max_tokens: 150,
           temperature: 0.7,
         },
         {
           headers: {
-            Authorization: `Bearer YOUR_OPENAI_API_KEY`,
+            Authorization: `Bearer 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`,
             "Content-Type": "application/json",
           },
         }
