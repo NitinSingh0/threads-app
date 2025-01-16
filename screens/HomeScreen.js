@@ -8,6 +8,10 @@ import {
   Alert,
   Animated,
   Easing,
+  TouchableOpacity,
+  Modal,
+  TextInput,
+  Button,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -25,7 +29,9 @@ const HomeScreen = () => {
   const [userId, setLocalUserId] = useState(null);
   const [posts, setPosts] = useState([]);
   const [likeScale] = useState(new Animated.Value(1)); // Animation for like button
-  //const jwtDecode = require("jwt-decode");
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [userMessage, setUserMessage] = useState("");
 
   const handleLogout = async () => {
     try {
@@ -124,77 +130,153 @@ const HomeScreen = () => {
     }
   };
 
-  return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Image
-          style={styles.profileImage}
-          source={{
-            uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
-          }}
-        />
-        <Text style={styles.appName}>Campus Connect</Text>
-        <View style={styles.headerIcons}>
-          <Ionicons
-            onPress={() => navigation.navigate("Chats")}
-            name="chatbox-ellipses-outline"
-            size={28}
-            color="#fff"
-            style={styles.icon}
-          />
-          <MaterialIcons
-            onPress={handleLogout}
-            name="logout"
-            size={28}
-            color="#fff"
-            style={styles.icon}
-          />
-        </View>
-      </View>
+  const handleSendMessage = async () => {
+    if (!userMessage.trim()) return;
 
-      {/* Posts */}
-      <View style={styles.postsContainer}>
-        {posts.map((post) => (
-          <View key={post._id} style={styles.postCard}>
-            <View style={styles.postHeader}>
-              <Image
-                style={styles.postProfileImage}
-                source={{
-                  uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
-                }}
-              />
-              <Text style={styles.postUserName}>{post.user.name}</Text>
-            </View>
-            <Text style={styles.postContent}>{post.content}</Text>
-            <View style={styles.postActions}>
-              {post.likes.includes(userId) ? (
-                <Animated.View style={{ transform: [{ scale: likeScale }] }}>
-                  <AntDesign
-                    onPress={() => handleUnlike(post._id)}
-                    name="heart"
-                    size={22}
-                    color="red"
-                  />
-                </Animated.View>
-              ) : (
-                <AntDesign
-                  onPress={() => handleLike(post._id)}
-                  name="hearto"
-                  size={22}
-                  color="gray"
-                />
-              )}
-              <FontAwesome name="comment-o" size={22} color="gray" />
-              <Ionicons name="share-social-outline" size={22} color="gray" />
-            </View>
-            <Text style={styles.postFooter}>
-              {post.likes.length} Kudos | {post.replies.length} Insights
-            </Text>
+    const newMessage = { sender: "user", text: userMessage };
+    setChatMessages((prev) => [...prev, newMessage]);
+    setUserMessage("");
+
+    try {
+      const response = await axios.post(
+        "https://api.openai.com/v1/completions",
+        {
+          model: "text-davinci-003",
+          prompt: userMessage,
+          max_tokens: 150,
+          temperature: 0.7,
+        },
+        {
+          headers: {
+            Authorization: `Bearer YOUR_OPENAI_API_KEY`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const botReply = response.data.choices[0].text.trim();
+      setChatMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
+    } catch (error) {
+      console.error("Error fetching chatbot reply", error);
+    }
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Image
+            style={styles.profileImage}
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
+            }}
+          />
+          <Text style={styles.appName}>Campus Connect</Text>
+          <View style={styles.headerIcons}>
+            <Ionicons
+              onPress={() => navigation.navigate("Chats")}
+              name="chatbox-ellipses-outline"
+              size={28}
+              color="#fff"
+              style={styles.icon}
+            />
+            <MaterialIcons
+              onPress={handleLogout}
+              name="logout"
+              size={28}
+              color="#fff"
+              style={styles.icon}
+            />
           </View>
-        ))}
-      </View>
-    </ScrollView>
+        </View>
+
+        {/* Posts */}
+        <View style={styles.postsContainer}>
+          {posts.map((post) => (
+            <View key={post._id} style={styles.postCard}>
+              <View style={styles.postHeader}>
+                <Image
+                  style={styles.postProfileImage}
+                  source={{
+                    uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
+                  }}
+                />
+                <Text style={styles.postUserName}>{post.user.name}</Text>
+              </View>
+              <Text style={styles.postContent}>{post.content}</Text>
+              <View style={styles.postActions}>
+                {post.likes.includes(userId) ? (
+                  <Animated.View style={{ transform: [{ scale: likeScale }] }}>
+                    <AntDesign
+                      onPress={() => handleUnlike(post._id)}
+                      name="heart"
+                      size={22}
+                      color="red"
+                    />
+                  </Animated.View>
+                ) : (
+                  <AntDesign
+                    onPress={() => handleLike(post._id)}
+                    name="hearto"
+                    size={22}
+                    color="gray"
+                  />
+                )}
+                <FontAwesome name="comment-o" size={22} color="gray" />
+                <Ionicons name="share-social-outline" size={22} color="gray" />
+              </View>
+              <Text style={styles.postFooter}>
+                {post.likes.length} Kudos | {post.replies.length} Insights
+              </Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* Chatbot Icon */}
+      <TouchableOpacity
+        style={styles.chatbotIcon}
+        onPress={() => setIsChatbotOpen(true)}
+      >
+        <Ionicons name="chatbubbles" size={28} color="#fff" />
+      </TouchableOpacity>
+
+      {/* Chatbot Modal */}
+      <Modal visible={isChatbotOpen} animationType="slide" transparent>
+        <View style={styles.chatbotModal}>
+          <View style={styles.chatbotHeader}>
+            <Text style={styles.chatbotTitle}>AI Chatbot</Text>
+            <TouchableOpacity onPress={() => setIsChatbotOpen(false)}>
+              <Ionicons name="close" size={28} color="#333" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView style={styles.chatMessages}>
+            {chatMessages.map((msg, index) => (
+              <View
+                key={index}
+                style={
+                  msg.sender === "user" ? styles.userMessage : styles.botMessage
+                }
+              >
+                <Text>{msg.text}</Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          <View style={styles.chatInputContainer}>
+            <TextInput
+              style={styles.chatInput}
+              placeholder="Type your message..."
+              value={userMessage}
+              onChangeText={setUserMessage}
+            />
+            <Button title="Send" onPress={handleSendMessage} />
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
@@ -281,4 +363,69 @@ const styles = StyleSheet.create({
     color: "gray",
     marginTop: 5,
   },
+  chatbotIcon: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#6A11CB",
+    borderRadius: 25,
+    padding: 12,
+    elevation: 5,
+  },
+  chatbotModal: {
+    flex: 1,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    marginTop: "auto",
+  },
+  chatbotHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  chatbotTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  chatMessages: {
+    flex: 1,
+    padding: 16,
+  },
+  userMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#DCF8C6",
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 5,
+    maxWidth: "80%",
+  },
+  botMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#E1E1E1",
+    borderRadius: 10,
+    padding: 10,
+    marginVertical: 5,
+    maxWidth: "80%",
+  },
+  chatInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+  },
+  chatInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    padding: 10,
+    marginRight: 10,
+    backgroundColor: "#F9F9F9",
+  },
 });
+
