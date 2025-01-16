@@ -6,13 +6,14 @@ import RegisterScreen from "./screens/RegisterScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./screens/HomeScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { jwtDecode } from "jwt-decode";
+//import { jwtDecode } from "jwt-decode";
 import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import ThreadsScreen from "./screens/ThreadsScreen";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivityScreen from "./screens/ActivityScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import ChatsScreen from "./screens/ChatsScreen";
 
 // Add animation for stack transitions
 const StackNavigator = () => {
@@ -70,6 +71,22 @@ const StackNavigator = () => {
           component={ActivityScreen}
           options={{
             tabBarLabel: "Engagements",
+            tabBarLabelStyle: { color: "black", fontSize: 12 },
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <AntDesign
+                name={focused ? "heart" : "hearto"}
+                size={24}
+                color={focused ? "#4F91F3" : "gray"}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Message"
+          component={ChatsScreen}
+          options={{
+            tabBarLabel: "Chat Room",
             tabBarLabelStyle: { color: "black", fontSize: 12 },
             headerShown: false,
             tabBarIcon: ({ focused }) => (
