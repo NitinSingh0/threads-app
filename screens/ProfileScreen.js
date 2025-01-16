@@ -11,7 +11,7 @@ import axios from "axios";
 import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-
+import { jwtDecode } from "jwt-decode";
 const ProfileScreen = () => {
   const [user, setUser] = useState({});
   const navigation = useNavigation();

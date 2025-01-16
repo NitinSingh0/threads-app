@@ -7,14 +7,14 @@ import {
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { UserType } from "../UserContext";
 import User from "../components/User";
 
 const ActivityScreen = () => {
   const [selectedButton, setSelectedButton] = useState("people");
-  const jwtDecode = require("jwt-decode");
+  //const jwtDecode = require("jwt-decode");
 
   const [users, setUsers] = useState([]);
   const { setUserId } = useContext(UserType);

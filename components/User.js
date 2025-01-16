@@ -1,6 +1,7 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useContext, useState } from "react";
 import { UserType } from "../UserContext";
+import { jwtDecode } from "jwt-decode";
 
 const User = ({ item }) => {
   const { userId, setUserId } = useContext(UserType);

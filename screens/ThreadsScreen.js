@@ -11,12 +11,12 @@ import React, { useContext, useState } from "react";
 import { UserType } from "../UserContext";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const ThreadsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
   const [content, setContent] = useState("");
-  const jwtDecode = require("jwt-decode");
+  // const jwtDecode = require("jwt-decode");
 
   const fetchUsers = async () => {
     try {
@@ -73,12 +73,12 @@ const ThreadsScreen = () => {
           style={styles.input}
           value={content}
           onChangeText={(text) => setContent(text)}
-          placeholder="Type your message... "
+          placeholder="Express yourself here... "
           placeholderTextColor={"gray"}
           multiline
         />
       </View>
-      <Button onPress={handlePostSubmit} title="Share Post" color="#007AFF" />
+      <Button onPress={handlePostSubmit} title="Send Voice" color="#007AFF" />
     </SafeAreaView>
   );
 };

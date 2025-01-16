@@ -16,6 +16,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { jwtDecode } from "jwt-decode";
 import { UserType } from "../UserContext";
 
 const HomeScreen = () => {
@@ -24,7 +25,7 @@ const HomeScreen = () => {
   const [userId, setLocalUserId] = useState(null);
   const [posts, setPosts] = useState([]);
   const [likeScale] = useState(new Animated.Value(1)); // Animation for like button
-const jwtDecode = require("jwt-decode");
+  //const jwtDecode = require("jwt-decode");
 
   const handleLogout = async () => {
     try {
@@ -188,7 +189,7 @@ const jwtDecode = require("jwt-decode");
               <Ionicons name="share-social-outline" size={22} color="gray" />
             </View>
             <Text style={styles.postFooter}>
-              {post.likes.length} likes | {post.replies.length} replies
+              {post.likes.length} Kudos | {post.replies.length} Insights
             </Text>
           </View>
         ))}
