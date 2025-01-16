@@ -246,7 +246,7 @@ const HomeScreen = () => {
       <Modal visible={isChatbotOpen} animationType="slide" transparent>
         <View style={styles.chatbotModal}>
           <View style={styles.chatbotHeader}>
-            <Text style={styles.chatbotTitle}>AI Chatbot</Text>
+            <Text style={styles.chatbotTitle}>SmartBuddy</Text>
             <TouchableOpacity onPress={() => setIsChatbotOpen(false)}>
               <Ionicons name="close" size={28} color="#333" />
             </TouchableOpacity>
