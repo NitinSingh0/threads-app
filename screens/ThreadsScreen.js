@@ -7,17 +7,34 @@ import {
   Button,
   TextInput,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserType } from "../UserContext";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 
+
 const ThreadsScreen = () => {
   const { userId, setUserId } = useContext(UserType);
+  const [user, setUser] = useState({});
   const [content, setContent] = useState("");
   // const jwtDecode = require("jwt-decode");
 
+
+useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(
+        `http://10.0.2.2:3000/profile/${userId}`
+      );
+      const { user } = response.data;
+      setUser(user);
+    } catch (error) {
+      console.log("Error", error);
+    }
+  };
+  fetchProfile();
+}, [userId]);
   const fetchUsers = async () => {
     try {
       const token = await AsyncStorage.getItem("authToken");
@@ -66,7 +83,7 @@ const ThreadsScreen = () => {
             uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
           }}
         />
-        <Text style={styles.profileName}>Nitin_Singh</Text>
+        <Text style={styles.profileName}>{user?.name}</Text>
       </View>
       <View style={styles.inputContainer}>
         <TextInput
