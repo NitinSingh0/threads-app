@@ -265,3 +265,18 @@ app.get("/profile/:userId", async (req, res) => {
     res.status(500).json({mesasge:"Error while getting the profile"})
   }
 })
+
+app.get("/posts/user/:userId", async (req, res) => {
+  try {
+    const userID = req.params.userId;
+    const posts = await Post.find({ user: userID })
+      .populate("user", "name")
+      .sort({ createdAt: -1 });
+    if (!posts) {
+      return res.status(404).json({ message: "No posts found for this user" });
+    }
+    res.status(200).json(posts);
+  } catch (error) {
+    res.status(500).json({ messsage: "An error occured while fetching post" });
+  }
+});

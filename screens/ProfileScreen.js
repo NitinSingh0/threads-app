@@ -4,16 +4,23 @@ import {
   View,
   Image,
   Pressable,
-  ScrollView,
+  FlatList, // Changed from ScrollView to FlatList
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { jwtDecode } from "jwt-decode";
+
 const ProfileScreen = () => {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({
+    name: "",
+    followers: [],
+    postsCount: 0,
+    followingCount: 0,
+    posts: [],
+  });
+  const [posts, setPosts] = useState([]);
   const navigation = useNavigation();
   const { userId, setUserId } = useContext(UserType);
 
@@ -25,8 +32,14 @@ const ProfileScreen = () => {
         );
         const { user } = response.data;
         setUser(user);
+
+        // Fetch the user's posts
+        const postsResponse = await axios.get(
+          `http://10.0.2.2:3000/posts/user/${userId}`
+        );
+        setPosts(postsResponse.data.posts);
       } catch (error) {
-        console.log("Error", error);
+        console.log("Error fetching profile or posts:", error);
       }
     };
     fetchProfile();
@@ -43,18 +56,18 @@ const ProfileScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.profileHeader}>
         <Image
           style={styles.coverImage}
-          source={{ uri: "https://example.com/cover-photo.jpg" }} // Add dynamic cover photo
+          source={{ uri: "https://example.com/cover-photo.jpg" }}
         />
         <View style={styles.profileInfo}>
           <Image
             style={styles.profilePicture}
             source={{
               uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
-            }} // Dynamic profile picture
+            }}
           />
           <Text style={styles.username}>{user?.name}</Text>
           <View style={styles.collegeBadge}>
@@ -83,11 +96,13 @@ const ProfileScreen = () => {
 
       <View style={styles.statsSection}>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{user?.postsCount}</Text>
+          <Text style={styles.statNumber}>0</Text>
+          {/* {posts.length} */}
           <Text style={styles.statLabel}>Posts</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{user?.followers?.length}</Text>
+          <Text style={styles.statNumber}>{0}</Text>
+          {/* user?.followers?.length */}
           <Text style={styles.statLabel}>Followers</Text>
         </View>
         <View style={styles.statItem}>
@@ -95,6 +110,17 @@ const ProfileScreen = () => {
           <Text style={styles.statLabel}>Following</Text>
         </View>
       </View>
+
+      <FlatList
+        data={posts}
+        renderItem={({ item }) => (
+          <View style={styles.postItem}>
+            <Text>{item.content}</Text>{" "}
+            {/* Assuming "content" is the post text */}
+          </View>
+        )}
+        keyExtractor={(item) => item._id.toString()} // Assuming "_id" is the post identifier
+      />
 
       <View style={styles.buttonsSection}>
         <Pressable style={styles.editProfileButton}>
@@ -108,7 +134,7 @@ const ProfileScreen = () => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>College Social Network</Text>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -233,5 +259,12 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 16,
     color: "#888",
+  },
+  postItem: {
+    marginTop: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#D0D0D0",
+    borderRadius: 8,
   },
 });
