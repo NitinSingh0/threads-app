@@ -57,7 +57,7 @@ const ChatMessagesScreen = () => {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        `https://chitchat-server-ih0u.onrender.com/messages/${userId}/${recepientId}`
+        `http://10.0.2.2:3000/messages/${userId}/${recepientId}`
       );
       const data = await response.json();
       if (response.ok) {
@@ -77,7 +77,7 @@ const ChatMessagesScreen = () => {
     const fetchRecepientData = async () => {
       try {
         const response = await fetch(
-          `https://chitchat-server-ih0u.onrender.com/user/${recepientId}`
+          `http://10.0.2.2:3000/user/${recepientId}`
         );
         const data = await response.json();
         setRecepientData(data);
@@ -107,13 +107,10 @@ const ChatMessagesScreen = () => {
         formData.append("messageText", message);
       }
 
-      const response = await fetch(
-        "https://chitchat-server-ih0u.onrender.com/messages",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch("http://10.0.2.2:3000/messages", {
+        method: "POST",
+        body: formData,
+      });
 
       if (response.ok) {
         setMessage("");
@@ -186,16 +183,13 @@ const ChatMessagesScreen = () => {
   }, [recepientData, selectedMessages]);
   const deleteMessages = async (messageIds) => {
     try {
-      const response = await fetch(
-        "https://chitchat-server-ih0u.onrender.com/deleteMessages",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ messages: messageIds }),
-        }
-      );
+      const response = await fetch("http://10.0.2.2:3000/deleteMessages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: messageIds }),
+      });
       if (response.ok) {
         setSelectedMessages((previousMessages) =>
           previousMessages.filter((id) => !messageIds.includes(id))

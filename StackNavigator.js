@@ -14,7 +14,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivityScreen from "./screens/ActivityScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ChatsScreen from "./screens/ChatsScreen";
-
+import OverviewScreen from "./screens/OverviewScreen";
+import FriendsScreen from "./screens/FriendsScreen";
 // Add animation for stack transitions
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -24,6 +25,7 @@ const StackNavigator = () => {
     return (
       <Tab.Navigator
         screenOptions={{
+          headerShown: true,
           tabBarStyle: {
             backgroundColor: "#F2F2F2",
             borderTopWidth: 0,
@@ -73,6 +75,22 @@ const StackNavigator = () => {
             tabBarLabel: "Engagements",
             tabBarLabelStyle: { color: "black", fontSize: 12 },
             headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <AntDesign
+                name={focused ? "heart" : "hearto"}
+                size={24}
+                color={focused ? "#4F91F3" : "gray"}
+              />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Activityy"
+          component={OverviewScreen}
+          options={{
+            tabBarLabel: "Engagements",
+            tabBarLabelStyle: { color: "black", fontSize: 12 },
+
             tabBarIcon: ({ focused }) => (
               <AntDesign
                 name={focused ? "heart" : "hearto"}
@@ -148,6 +166,20 @@ const StackNavigator = () => {
           component={BottomTabs}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="Chats"
+          component={ChatsScreen}
+          options={{
+            headerShown: true, // Customize the header title for this screen
+          }}
+        />
+        <Stack.Screen
+          name="Friends"
+          component={FriendsScreen}
+          options={{
+            headerShown: true, // Customize the header title for this screen
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -157,5 +189,5 @@ export default StackNavigator;
 
 // You can add your styles here, if necessary
 const styles = StyleSheet.create({
-  // Add custom styles here if needed
+  // Add custom styles here if needed Friends
 });

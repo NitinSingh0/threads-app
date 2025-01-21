@@ -7,7 +7,8 @@ import { UserType } from "../UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import User from "../componenets/User";
+
+import User from "../components/User1";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -67,13 +68,14 @@ const HomeScreen = () => {
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
       setUserId(userId);
+      console.log("User Id : ", userId);
       axios
-        .get(`https://chitchat-server-ih0u.onrender.com/users/${userId}`)
+        .get(`http://10.0.2.2:3000/user/${userId}`)
         .then((response) => {
           setUsers(response.data);
         })
         .catch((error) => {
-          console.log("Error retriving users ", error);
+          console.log("Error retriving users ", error.message);
         });
     };
     fetchUsers();

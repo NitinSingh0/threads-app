@@ -9,10 +9,32 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profilePicture: { type: String },
+  image: {
+    type: String,
+    default: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
+  },
   joinedDate: { type: Date, default: Date.now },
   sentFollowRequest: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   receivedFollowRequests: [
     { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  ],
+  friendRequest: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  friends: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  sentFriendRequest: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   ],
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   verified: {

@@ -13,7 +13,7 @@ const ChatsScreen = () => {
     const acceptedFriendsList = async () => {
       try {
         const response = await fetch(
-          `https://chitchat-server-ih0u.onrender.com/accepted-friends/${userId}`
+          `http://10.0.2.2:3000/accepted-friends/${userId}`
         );
         const data = await response.json();
         if (response.ok) {
