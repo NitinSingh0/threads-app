@@ -34,6 +34,7 @@ app.listen(port, () => {
 
 const User = require("./models/user");
 const Post = require("./models/post");
+const Message = require("./models/message");
 
 //endpoint to register a user in the backend
 app.post("/register", async (req, res) => {

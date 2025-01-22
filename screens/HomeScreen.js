@@ -133,33 +133,77 @@ const HomeScreen = () => {
   const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
 
+    // Add the user's message to the chat
     const newMessage = { sender: "user", text: userMessage };
     setChatMessages((prev) => [...prev, newMessage]);
     setUserMessage("");
 
     try {
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-4o-mini",
-          prompt: userMessage,
-          max_tokens: 150,
-          temperature: 0.7,
-        },
-        {
-          headers: {
-            Authorization: `Bearer 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`,
-            "Content-Type": "application/json",
-          },
-        }
+      // Check for specific keywords related to study and Campus Connect
+      const studyKeywords = [
+        "study",
+        "course",
+        "assignment",
+        "exam",
+        "campus connect",
+        "education",
+      ];
+      const isEducationalQuery = studyKeywords.some((keyword) =>
+        userMessage.toLowerCase().includes(keyword)
       );
 
-      const botReply = response.data.choices[0].text.trim();
+      if (!isEducationalQuery) {
+        const botReply =
+          "This bot is for educational purposes. Please ask study or Campus Connect-related questions.";
+        setChatMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
+        return;
+      }
+
+      // Initialize the Google Generative AI SDK
+      const { GoogleGenerativeAI } = require("@google/generative-ai");
+      const genAI = new GoogleGenerativeAI(
+        "AIzaSyCBMtfl0J6pE8HmMC0drHyv_nLTJlBa59Y"
+      );
+
+      // Define chatbot configuration
+      const chatbotConfig = {
+        model: "gemini-1.5-flash", // Specify the model
+        temperature: 0.7, // Controls creativity (0: deterministic, 1: very creative)
+        max_tokens: 150, // Limit the length of the response
+        top_p: 0.9, // Controls diversity via nucleus sampling
+      };
+
+      // Create a generative model with the specified configuration
+      const model = genAI.getGenerativeModel({ model: chatbotConfig.model });
+
+      // Generate content using the chatbot configuration
+      const prompt = userMessage;
+      const result = await model.generateContent(prompt, {
+        temperature: chatbotConfig.temperature,
+        maxTokens: chatbotConfig.max_tokens,
+        topP: chatbotConfig.top_p,
+      });
+
+      // Extract the bot's reply
+      const botReply = result.response.text();
+
+      // Add the bot's reply to the chat
       setChatMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
     } catch (error) {
       console.error("Error fetching chatbot reply", error);
+
+      // Fallback message in case of an error
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "Sorry, something went wrong. Please try again later.",
+        },
+      ]);
     }
   };
+
+
 
   return (
     <View style={{ flex: 1 }}>

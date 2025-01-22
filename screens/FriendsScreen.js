@@ -14,7 +14,7 @@ const FriendsScreen = () => {
     console.log("User Id : ", userId);
     try {
       const response = await axios.get(
-        `https://10.0.2.2:3000/friend-request/${userId}`
+        `http://10.0.2.2:3000/friend-request/${userId}`
       );
       if (response.status === 200) {
         const friendRequestData = response.data.map((friendRequest) => ({
@@ -24,6 +24,7 @@ const FriendsScreen = () => {
           image : friendRequest.image,
         }));
         setFriendRequests(friendRequestData);
+        
       }
     } catch (error) {
       console.log("Error message ", error.message);
