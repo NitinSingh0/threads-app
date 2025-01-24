@@ -30,10 +30,12 @@ const User = ({ item }) => {
   useEffect(() => {
     const fetchUserFriends = async () => {
       try {
-        const response = await fetch(`http:/10.0.2.2:3000/friends/${userId}`);
+        console.log("User id in friends page : ", userId);
+        const response = await fetch(`http://10.0.2.2:3000/friends/${userId}`);
         const data = await response.json();
         if (response.ok) {
           setUserFriends(data);
+          console.log("User Fiends : ", userFriends);
         } else {
           console.log("Error retreiving user friends ", response.status);
         }

@@ -17,6 +17,8 @@ import ChatsScreen from "./screens/ChatsScreen";
 import OverviewScreen from "./screens/OverviewScreen";
 import FriendsScreen from "./screens/FriendsScreen";
 import ChatMessagesScreen from "./screens/ChatMessagesScreen";
+import EditProfileScreen from "./screens/EditProfileScreen";
+
 // Add animation for stack transitions
 const StackNavigator = () => {
   const Stack = createNativeStackNavigator();
@@ -174,16 +176,17 @@ const StackNavigator = () => {
             headerShown: true, // Customize the header title for this screen
           }}
         />
+        <Stack.Screen name="Messages" component={ChatMessagesScreen} />
         <Stack.Screen
-          name="Messages"
-          component={ChatMessagesScreen}
+          name="Friends"
+          component={FriendsScreen}
           options={{
             headerShown: true, // Customize the header title for this screen
           }}
         />
         <Stack.Screen
-          name="Friends"
-          component={FriendsScreen}
+          name="EditProfile"
+          component={EditProfileScreen}
           options={{
             headerShown: true, // Customize the header title for this screen
           }}

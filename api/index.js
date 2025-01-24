@@ -219,7 +219,41 @@ app.put("/post/:postId/:userId/like", async (req, res) => {
     res.status(500).json({ message: "An error occured while liking" });
   }
 });
+//endpoint to update the profile
+app.put("/profile/:userId", async (req, res) => {
+  const { userId } = req.params; // Extract userId from the request params
+  const { name, profilePicture, backgroundPicture, course, bio, passingYear } =
+    req.body; // Destructure data from the request body
 
+  try {
+    // Find the user by ID and update their profile
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        name,
+        profilePicture,
+        backgroundPicture,
+        course,
+        bio,
+        passingYear,
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with the updated user
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Failed to update profile", error });
+  }
+});
 //endpoint to unlike a particular post
 app.put("/post/:postId/:userId/unlike", async (req, res) => {
   try {
@@ -274,14 +308,17 @@ app.get("/posts/user/:userId", async (req, res) => {
     const posts = await Post.find({ user: userID })
       .populate("user", "name")
       .sort({ createdAt: -1 });
-    if (!posts) {
+    if (!posts.length) {
       return res.status(404).json({ message: "No posts found for this user" });
     }
-    res.status(200).json(posts);
+    res.status(200).json({ posts }); // Return posts as an object with a 'posts' key
   } catch (error) {
-    res.status(500).json({ messsage: "An error occured while fetching post" });
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching posts", error });
   }
 });
+
 
 
 
@@ -421,7 +458,7 @@ app.post("/messages", upload.single("imageFile"), async (req, res) => {
 
 //end point to get the userDetails to design the chat room header
 
-app.get("/user/:userId", async (req, res) => {
+app.get("/user/recepient/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
     //fetch the user data from the userID
@@ -448,5 +485,49 @@ app.get("/messages/:senderId/:recepientId", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+app.get("/friends/:userId", (req, res) => {
+  try {
+    const { userId } = req.params;
+    User.findById(userId)
+      .populate("friends")
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        const friendsIds = user.friends.map((friend) => friend._id);
+        res.status(200).json(friendsIds);
+      });
+  } catch (error) {
+    console.log("Error : ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+app.get("/friend-requests/sent/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId)
+      .populate("sentFriendRequest", "name email image")
+      .lean();
+    const sentFriendRequests = user.sentFriendRequest;
+    res.json(sentFriendRequests);
+  } catch (error) {
+    console.log("Error : ", error);
+    res.status(500).json({ error: "Internal server " });
+  }
+});
+//endpoint to delete the messages!
+app.post("/deleteMessages", async (req, res) => {
+  try {
+    const { messages } = req.body;
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ message: "Invalid request body!" });
+    }
+    await Message.deleteMany({ _id: { $in: messages } });
+    res.json({ message: "Message deleted successfully" });
+  } catch (error) {
+    console.log("Error : ", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });

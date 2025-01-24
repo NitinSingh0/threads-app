@@ -13,6 +13,23 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
   },
+  backgroundPicture: {
+    type: String,
+    default:
+      "https://img.freepik.com/free-vector/colored-points-connected-net_1048-12426.jpg?ga=GA1.1.1157197616.1706377125&semt=ais_hybrid",
+  },
+  bio: {
+    type: String,
+  },
+  course: {
+    type: String,
+  },
+  userRole: {
+    type: String,
+  },
+  passingYear: {
+    type:String,
+  },
   joinedDate: { type: Date, default: Date.now },
   sentFollowRequest: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   receivedFollowRequests: [

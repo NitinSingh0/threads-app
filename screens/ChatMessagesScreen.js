@@ -27,7 +27,7 @@ import * as ImagePicker from "expo-image-picker";
 const ChatMessagesScreen = () => {
   const [showEmojiSelector, setShowEmojiSelector] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState([]);
-  const { userId, setUserId } = useContext(UserType);
+  const { userId } = useContext(UserType);
   const route = useRoute();
   const { recepientId } = route.params;
   const [recepientData, setRecepientData] = useState("");
@@ -77,10 +77,11 @@ const ChatMessagesScreen = () => {
     const fetchRecepientData = async () => {
       try {
         const response = await fetch(
-          `http://10.0.2.2:3000/user/${recepientId}`
+          `http://10.0.2.2:3000/user/recepient/${recepientId}`
         );
         const data = await response.json();
         setRecepientData(data);
+        console.log("Recepiengt data : ", recepientData);
       } catch (error) {
         console.log("Error retreving details : ", error);
       }
