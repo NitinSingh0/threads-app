@@ -68,6 +68,10 @@ const HomeScreen = () => {
     followingCount: 0,
     posts: [],
   });
+  const [commentInput, setCommentInput] = useState({
+    user: "Anonymous",
+    content: " ",
+  });
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -152,6 +156,26 @@ const HomeScreen = () => {
     }
   };
 
+  const handleAddComment = async (postId, newComment) => {
+    if (!newComment.trim()) return;
+
+    try {
+      const response = await axios.post(
+        `http://10.0.2.2:3000/post/${postId}/comment`,
+        { comment: newComment, userId }
+      );
+
+      const updatedPost = response.data;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === updatedPost._id ? updatedPost : post
+        )
+      );
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
 
@@ -226,11 +250,16 @@ const HomeScreen = () => {
       console.error("Error fetching chatbot reply", error);
 
       // Fallback message in case of an error
+      if (error.response) {
+        console.error("Chatbot API Error:", error.response.data);
+      } else {
+        console.error("Network Error:", error.message);
+      }
       setChatMessages((prev) => [
         ...prev,
         {
           sender: "bot",
-          text: "Sorry, something went wrong. Please try again later.",
+          text: "Unable to process your request. Please try again later.",
         },
       ]);
     }
@@ -274,7 +303,9 @@ const HomeScreen = () => {
                 <Image
                   style={styles.postProfileImage}
                   source={{
-                    uri: user?.profilePicture, //need to correct
+                    uri:
+                      post?.user?.profilePicture ||
+                      "https://cdn-icons-png.flaticon.com/128/149/149071.png",
                   }}
                 />
                 <Text style={styles.postUserName}>{post.user.name}</Text>
@@ -304,6 +335,38 @@ const HomeScreen = () => {
               <Text style={styles.postFooter}>
                 {post.likes.length} Kudos | {post.replies.length} Insights
               </Text>
+
+              {/* Comment Section */}
+              <View style={styles.commentsSection}>
+                <Text style={styles.commentsTitle}>Comments:</Text>
+                <ScrollView style={styles.commentsList}>
+                  {post.comments.map((comment, index) => (
+                    <View key={index} style={styles.comment}>
+                      <Text style={styles.commentAuthor}>
+                        {comment.user.name}:
+                      </Text>
+                      <Text style={styles.commentText}>{comment.text}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+                <View style={styles.commentInputContainer}>
+                  <TextInput
+                    style={styles.commentInput}
+                    placeholder="Add a comment..."
+                    value={commentInput[post._id] || ""}
+                    onChangeText={(text) =>
+                      setCommentInput((prev) => ({ ...prev, [post._id]: text }))
+                    }
+                  />
+                  <Button
+                    title="Post"
+                    onPress={() => {
+                      handleAddComment(post._id, commentInput[post._id] || "");
+                      setCommentInput((prev) => ({ ...prev, [post._id]: "" }));
+                    }}
+                  />
+                </View>
+              </View>
             </View>
           ))}
         </View>
@@ -515,5 +578,43 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderWidth: 1,
     borderColor: "#ddd",
+  },
+  commentsSection: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "#F9F9F9",
+    borderRadius: 10,
+  },
+  commentsTitle: {
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  commentsList: {
+    maxHeight: 100,
+    marginBottom: 10,
+  },
+  comment: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 5,
+  },
+  commentAuthor: {
+    fontWeight: "bold",
+    marginRight: 5,
+  },
+  commentText: {
+    flex: 1,
+  },
+  commentInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  commentInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#CCC",
+    borderRadius: 5,
+    padding: 5,
+    marginRight: 5,
   },
 });

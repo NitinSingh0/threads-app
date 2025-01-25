@@ -143,6 +143,23 @@ app.get("/user/:userId", (req, res) => {
   }
 });
 
+//endpoint to get the friend list
+app.get("/user/friendslist/:userId", (req, res) => {
+   try {
+     const loggedInUSerId = req.params.userId;
+     User.find({ _id: { $ne: loggedInUSerId } })
+       .then((users) => {
+         res.status(200).json(users);
+       })
+       .catch((error) => {
+         console.log("Error : ", error);
+         res.status(500).json("error");
+       });
+   } catch (error) {
+     res.status(500).json({ message: "error getting user" });
+   }
+});
+
 //endpoint to follow a particular user
 app.post("/follow", async (req, res) => {
   const { currentUserId, selectedUserId } = req.body;
@@ -517,6 +534,22 @@ app.get("/friend-requests/sent/:userId", async (req, res) => {
     res.status(500).json({ error: "Internal server " });
   }
 });
+
+app.post("/post/:postId/comment", async (req, res) => {
+  const { postId } = req.params;
+  const { userId, comment } = req.body;
+
+  try {
+    const post = await Post.findById(postId);
+    post.comments.push({ user: userId, text: comment });
+    await post.save();
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ message: "Error adding comment", error });
+  }
+});
+
+
 //endpoint to delete the messages!
 app.post("/deleteMessages", async (req, res) => {
   try {

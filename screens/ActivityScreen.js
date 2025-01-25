@@ -46,6 +46,36 @@ const ActivityScreen = () => {
 
     fetchUsers();
   }, [setUserId]);
+
+  //fetch only friends list
+  const [friendsList, setFriendsList] = useState([]);
+   useEffect(() => {
+     const fetchFriends = async () => {
+       try {
+         const token = await AsyncStorage.getItem("authToken");
+         if (!token) {
+           console.error("Auth token not found");
+           return;
+         }
+
+         const decodeToken = jwtDecode(token);
+         const userId = decodeToken.userId;
+         setUserId(userId);
+
+         const response = await axios.get(
+           `http://10.0.2.2:3000/user/friendslist/${userId}`
+         );
+         setFriendsList(response.data);
+       } catch (error) {
+         console.error("Error fetching users:", error);
+       }
+     };
+
+     fetchFriends();
+   }, [setUserId]);
+
+
+
   const [friendRequests, setFriendRequests] = useState([]);
   useEffect(() => {
     fetchFriendRequests();
