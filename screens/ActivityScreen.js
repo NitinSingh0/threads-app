@@ -10,14 +10,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { UserType } from "../UserContext";
-import User from "../components/User";
+import User from "../components/User1";
+import FriendRequest from "../components/FriendRequest";
 
 const ActivityScreen = () => {
   const [selectedButton, setSelectedButton] = useState("people");
   //const jwtDecode = require("jwt-decode");
 
   const [users, setUsers] = useState([]);
-  const { setUserId } = useContext(UserType);
+  const {userId, setUserId } = useContext(UserType);
 
   const handleButtonClick = (buttonName) => {
     setSelectedButton(buttonName);
@@ -45,11 +46,35 @@ const ActivityScreen = () => {
 
     fetchUsers();
   }, [setUserId]);
+  const [friendRequests, setFriendRequests] = useState([]);
+  useEffect(() => {
+    fetchFriendRequests();
+  }, []);
+  const fetchFriendRequests = async () => {
+    console.log("User Id : ", userId);
+    try {
+      const response = await axios.get(
+        `http://10.0.2.2:3000/friend-request/${userId}`
+      );
+      if (response.status === 200) {
+        const friendRequestData = response.data.map((friendRequest) => ({
+          _id: friendRequest._id,
+          name: friendRequest.name,
+          email: friendRequest.email,
+          image: friendRequest.image,
+        }));
+        setFriendRequests(friendRequestData);
+      }
+    } catch (error) {
+      console.log("Error message ", error.message);
+    }
+  };
+  console.log("Friend Request: ",friendRequests);
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Activity</Text>
+        <Text style={styles.title}>Engagements</Text>
 
         <View style={styles.buttonGroup}>
           {["people", "all", "requests"].map((buttonName) => (
@@ -81,6 +106,28 @@ const ActivityScreen = () => {
               ) : (
                 <Text style={styles.noDataText}>No users found.</Text>
               )}
+            </View>
+          )}
+          {selectedButton === "all" && (
+            <View style={styles.userList}>
+              {users?.length > 0 ? (
+                users.map((item, index) => <User key={index} item={item} />)
+              ) : (
+                <Text style={styles.noDataText}>No users found.</Text>
+              )}
+            </View>
+          )}
+          {selectedButton === "requests" && (
+            <View style={{ padding: 10, marginHorizontal: 12 }}>
+              {friendRequests.length > 0 && <Text> Your Friend Requests!</Text>}
+              {friendRequests.map((item, index) => (
+                <FriendRequest
+                  key={index}
+                  item={item}
+                  friendRequests={friendRequests}
+                  setFriendRequests={setFriendRequests}
+                />
+              ))}
             </View>
           )}
         </View>

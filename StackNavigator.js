@@ -87,7 +87,7 @@ const StackNavigator = () => {
             ),
           }}
         />
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Activityy"
           component={OverviewScreen}
           options={{
@@ -102,7 +102,7 @@ const StackNavigator = () => {
               />
             ),
           }}
-        />
+        /> */}
         <Tab.Screen
           name="Message"
           component={ChatsScreen}
