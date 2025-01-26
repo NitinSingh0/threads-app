@@ -540,8 +540,9 @@ app.post("/post/:postId/comment", async (req, res) => {
   const { userId, comment } = req.body;
 
   try {
+    
     const post = await Post.findById(postId);
-    post.comments.push({ user: userId, text: comment });
+    post.replies.push({ user: userId, content: comment });
     await post.save();
     res.status(200).json(post);
   } catch (error) {
