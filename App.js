@@ -3,14 +3,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import StackNavigator from "./StackNavigator";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { UserContext } from './UserContext';
+import { MenuProvider } from "react-native-popup-menu";
 
 export default function App() {
   return (
-    <UserContext>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <StackNavigator />
-      </GestureHandlerRootView>
-    </UserContext>
+    <MenuProvider>
+      <UserContext>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <StackNavigator />
+        </GestureHandlerRootView>
+      </UserContext>
+    </MenuProvider>
   );
 }
 

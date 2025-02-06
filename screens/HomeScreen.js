@@ -1,4 +1,13 @@
+//AIzaSyCBMtfl0J6pE8HmMC0drHyv_nLTJlBa59Y
+
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from "react-native-popup-menu";
+
 import {
   StyleSheet,
   Text,
@@ -22,6 +31,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { jwtDecode } from "jwt-decode";
 import { UserType } from "../UserContext";
+import * as Animatable from "react-native-animatable"; // For animations
 
 const HomeScreen = () => {
   const { setUserId } = useContext(UserType);
@@ -32,446 +42,525 @@ const HomeScreen = () => {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
   const [userMessage, setUserMessage] = useState("");
-   const [visibleComments, setVisibleComments] = useState({});
+  const [visibleComments, setVisibleComments] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [reportReason, setReportReason] = useState("");
 
-   const toggleComments = (postId) => {
-     setVisibleComments((prev) => ({
-       ...prev,
-       [postId]: !prev[postId],
-     }));
-   };
-   const handleLogout = async () => {
-     try {
-       await AsyncStorage.removeItem("authToken");
-       Alert.alert("Logged out", "You have been logged out successfully.");
-       navigation.replace("Login");
-     } catch (error) {
-       console.error("Error during logout:", error);
-       Alert.alert("Error", "An error occurred during logout.");
-     }
-   };
+  // Toggle comments visibility
+  const toggleComments = (postId) => {
+    setVisibleComments((prev) => ({
+      ...prev,
+      [postId]: !prev[postId],
+    }));
+  };
 
-   const animateLike = () => {
-     Animated.sequence([
-       Animated.timing(likeScale, {
-         toValue: 1.5,
-         duration: 150,
-         easing: Easing.linear,
-         useNativeDriver: true,
-       }),
-       Animated.timing(likeScale, {
-         toValue: 1,
-         duration: 150,
-         easing: Easing.linear,
-         useNativeDriver: true,
-       }),
-     ]).start();
-   };
+  // Function to submit the report
+  const submitReport = async () => {
+    if (!reportReason.trim()) {
+      Alert.alert("Error", "Please provide a reason for reporting.");
+      return;
+    }
 
-   const [user, setUser] = useState({
-     name: "Anonymous",
-     followers: [],
-     postsCount: 0,
-     followingCount: 0,
-     posts: [],
-   });
-   const [commentInput, setCommentInput] = useState({
-     user: "Anonymous",
-     content: " ",
-   });
+    try {
+      const response = await fetch("https://your-backend-api.com/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: post._id,
+          reportedBy: userId,
+          reason: reportReason,
+          reportedAt: new Date().toISOString(),
+        }),
+      });
 
-   useEffect(() => {
-     const fetchUserId = async () => {
-       try {
-         const token = await AsyncStorage.getItem("authToken");
-         const userId = jwtDecode(token).userId;
-         setLocalUserId(userId);
-         setUserId(userId);
-       } catch (error) {
-         console.error("Error decoding token", error);
-       }
-     };
+      const data = await response.json();
 
-     fetchUserId();
-     fetchProfile();
-   }, []);
+      if (data.success) {
+        Alert.alert("Success", "Report submitted successfully.");
+        setModalVisible(false);
+        setReportReason("");
+      } else {
+        Alert.alert("Error", data.message || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      Alert.alert("Error", "Failed to submit report. Please try again.");
+    }
+  };
 
-   const fetchProfile = async () => {
-     try {
-       const response = await axios.get(
-         `http://10.0.2.2:3000/profile/${userId}`
-       );
-       const { user } = response.data;
-       setUser(user);
-       console.log("User : ", user);
-     } catch (error) {
-       console.log("Error fetching profile", error);
-     }
-   };
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("authToken");
+      Alert.alert("Logged out", "You have been logged out successfully.");
+      navigation.replace("Login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+      Alert.alert("Error", "An error occurred during logout.");
+    }
+  };
 
-   useEffect(() => {
-     fetchPosts();
-   }, []);
+  // Animate like button
+  const animateLike = () => {
+    Animated.sequence([
+      Animated.timing(likeScale, {
+        toValue: 1.5,
+        duration: 150,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(likeScale, {
+        toValue: 1,
+        duration: 150,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
-   useFocusEffect(
-     useCallback(() => {
-       fetchPosts();
-     }, [])
-   );
+  const [user, setUser] = useState({
+    name: "Anonymous",
+    followers: [],
+    postsCount: 0,
+    followingCount: 0,
+    posts: [],
+  });
+  const [commentInput, setCommentInput] = useState({
+    user: "Anonymous",
+    content: " ",
+  });
 
-   const fetchPosts = async () => {
-     try {
-       const response = await axios.get("http://10.0.2.2:3000/get-posts");
-       setPosts(response.data);
-     } catch (error) {
-       console.error("Error fetching posts", error);
-     }
-   };
+  // Fetch user ID and profile
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        const userId = jwtDecode(token).userId;
+        setLocalUserId(userId);
+        setUserId(userId);
+      } catch (error) {
+        console.error("Error decoding token", error);
+      }
+    };
 
-   const handleLike = async (postId) => {
-     if (!userId) return;
-     animateLike();
-     try {
-       const response = await axios.put(
-         `http://10.0.2.2:3000/post/${postId}/${userId}/like`
-       );
-       const updatedPost = response.data;
-       setPosts((prevPosts) =>
-         prevPosts.map((post) =>
-           post._id === updatedPost._id ? updatedPost : post
-         )
-       );
-     } catch (error) {
-       console.error("Error liking the post", error);
-     }
-   };
+    fetchUserId();
+    fetchProfile();
+  }, []);
 
-   const handleUnlike = async (postId) => {
-     if (!userId) return;
-     try {
-       const response = await axios.put(
-         `http://10.0.2.2:3000/post/${postId}/${userId}/unlike`
-       );
-       const updatedPost = response.data;
-       setPosts((prevPosts) =>
-         prevPosts.map((post) =>
-           post._id === updatedPost._id ? updatedPost : post
-         )
-       );
-     } catch (error) {
-       console.error("Error unliking the post", error);
-     }
-   };
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(
+        `http://10.0.2.2:3000/profile/${userId}`
+      );
+      const { user } = response.data;
+      setUser(user);
+      console.log("User : ", user);
+    } catch (error) {
+      console.log("Error fetching profile", error);
+    }
+  };
 
-   const handleAddComment = async (postId, newComment) => {
-     if (!newComment.trim()) return;
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
-     try {
-       console.log("Post id : ", postId);
-       console.log("Comment  : ", newComment);
-       const response = await axios.post(
-         `http://10.0.2.2:3000/post/${postId}/comment`,
-         { comment: newComment, userId }
-       );
+  // Fetch posts
+  useFocusEffect(
+    useCallback(() => {
+      fetchPosts();
+    }, [])
+  );
 
-       const updatedPost = response.data;
-       setPosts((prevPosts) =>
-         prevPosts.map((post) =>
-           post._id === updatedPost._id ? updatedPost : post
-         )
-       );
-     } catch (error) {
-       console.error("Error adding comment:", error);
-     }
-   };
+  const fetchPosts = async () => {
+    try {
+      const response = await axios.get("http://10.0.2.2:3000/get-posts");
+      setPosts(response.data);
+    } catch (error) {
+      console.error("Error fetching posts", error);
+    }
+  };
 
-   const handleSendMessage = async () => {
-     if (!userMessage.trim()) return;
+  const Cursor = () => {
+    const [blink, setBlink] = useState(false);
 
-     // Add the user's message to the chat
-     const newMessage = { sender: "user", text: userMessage };
-     setChatMessages((prev) => [...prev, newMessage]);
-     setUserMessage("");
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setBlink((prev) => !prev);
+      }, 500); // Blink every 500ms
+      return () => clearInterval(interval);
+    }, []);
 
-     try {
-       // Check for specific keywords related to study and Campus Connect
-       const studyKeywords = [
-         "study",
-         "course",
-         "assignment",
-         "exam",
-         "campus connect",
-         "education",
-         "hii",
-         "hello",
-         "hlo",
-         "hey",
-         "heyy",
-         "good",
-         "morning",
-         "evening",
-         "night",
-         "byy",
-         "thank",
-       ];
-       const isEducationalQuery = studyKeywords.some((keyword) =>
-         userMessage.toLowerCase().includes(keyword)
-       );
+    return <View style={[styles.cursor, { opacity: blink ? 1 : 0 }]} />;
+  };
 
-       if (!isEducationalQuery) {
-         const botReply =
-           "This bot is for educational purposes. Please ask study or Campus Connect-related questions.";
-         setChatMessages((prev) => [
-           ...prev,
-           { sender: "bot", text: botReply },
-         ]);
-         return;
-       }
+  // Handle like/unlike
+  const handleLike = async (postId) => {
+    if (!userId) return;
+    animateLike();
+    try {
+      const response = await axios.put(
+        `http://10.0.2.2:3000/post/${postId}/${userId}/like`
+      );
+      const updatedPost = response.data;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === updatedPost._id ? updatedPost : post
+        )
+      );
+    } catch (error) {
+      console.error("Error liking the post", error);
+    }
+  };
 
-       // Initialize the Google Generative AI SDK
-       const { GoogleGenerativeAI } = require("@google/generative-ai");
-       const genAI = new GoogleGenerativeAI(
-         "AIzaSyCBMtfl0J6pE8HmMC0drHyv_nLTJlBa59Y"
-       );
+  const handleUnlike = async (postId) => {
+    if (!userId) return;
+    try {
+      const response = await axios.put(
+        `http://10.0.2.2:3000/post/${postId}/${userId}/unlike`
+      );
+      const updatedPost = response.data;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === updatedPost._id ? updatedPost : post
+        )
+      );
+    } catch (error) {
+      console.error("Error unliking the post", error);
+    }
+  };
 
-       // Define chatbot configuration
-       const chatbotConfig = {
-         model: "gemini-1.5-flash", // Specify the model
-         temperature: 1, // Controls creativity (0: deterministic, 1: very creative)
-         max_tokens: 50, // Limit the length of the response
-         top_p: 0.9, // Controls diversity via nucleus sampling
-       };
+  // Handle adding comments
+  const handleAddComment = async (postId, newComment) => {
+    if (!newComment.trim()) return;
 
-       // Create a generative model with the specified configuration
-       const model = genAI.getGenerativeModel({ model: chatbotConfig.model });
+    try {
+      const response = await axios.post(
+        `http://10.0.2.2:3000/post/${postId}/comment`,
+        { comment: newComment, userId }
+      );
+      const updatedPost = response.data;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === updatedPost._id ? updatedPost : post
+        )
+      );
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
 
-       // Generate content using the chatbot configuration
-       const prompt = userMessage;
-       const result = await model.generateContent(prompt, {
-         temperature: chatbotConfig.temperature,
-         maxTokens: chatbotConfig.max_tokens,
-         topP: chatbotConfig.top_p,
-       });
+  // Handle chatbot messages
+  const handleSendMessage = async () => {
+    if (!userMessage.trim()) return;
 
-       // Extract the bot's reply
-       const botReply = result.response.text();
+    const newMessage = { sender: "user", text: userMessage };
+    setChatMessages((prev) => [...prev, newMessage]);
+    setUserMessage("");
 
-       // Add the bot's reply to the chat
-       setChatMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
-     } catch (error) {
-       console.error("Error fetching chatbot reply", error);
+    try {
+      const studyKeywords = [
+        "study",
+        "course",
+        "assignment",
+        "exam",
+        "campus connect",
+        "education",
+        "hii",
+        "hello",
+        "hlo",
+        "hey",
+        "heyy",
+        "good",
+        "morning",
+        "evening",
+        "night",
+        "byy",
+        "thank",
+      ];
+      const isEducationalQuery = studyKeywords.some((keyword) =>
+        userMessage.toLowerCase().includes(keyword)
+      );
 
-       // Fallback message in case of an error
-       if (error.response) {
-         console.error("Chatbot API Error:", error.response.data);
-       } else {
-         console.error("Network Error:", error.message);
-       }
-       setChatMessages((prev) => [
-         ...prev,
-         {
-           sender: "bot",
-           text: "Unable to process your request. Please try again later.",
-         },
-       ]);
-     }
-   };
+      if (!isEducationalQuery) {
+        const botReply =
+          "This bot is for educational purposes. Please ask study or Campus Connect-related questions.";
+        setChatMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
+        return;
+      }
 
-   return (
-     <View style={{ flex: 1 }}>
-       <ScrollView style={styles.container}>
-         {/* Header */}
-         <View style={styles.header}>
-           <Image
-             style={styles.profileImage}
-             source={{
-               uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
-             }}
-           />
-           <Text style={styles.appName}>Campus Connect</Text>
-           <View style={styles.headerIcons}>
-             <Ionicons
-               onPress={() => navigation.navigate("Chats")}
-               name="chatbox-ellipses-outline"
-               size={28}
-               color="#fff"
-               style={styles.icon}
-             />
-             <MaterialIcons
-               onPress={handleLogout}
-               name="logout"
-               size={28}
-               color="#fff"
-               style={styles.icon}
-             />
-           </View>
-         </View>
+      const { GoogleGenerativeAI } = require("@google/generative-ai");
+      const genAI = new GoogleGenerativeAI(
+        "AIzaSyCBMtfl0J6pE8HmMC0drHyv_nLTJlBa59Y"
+      );
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const result = await model.generateContent(userMessage);
+      const botReply = result.response.text();
+      setChatMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
+    } catch (error) {
+      console.error("Error fetching chatbot reply", error);
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "Unable to process your request. Please try again later.",
+        },
+      ]);
+    }
+  };
 
-         {/* Posts */}
-         <View style={styles.postsContainer}>
-           {posts && posts.length > 0 ? (
-             posts.map((post) => (
-               <View key={post._id} style={styles.postCard}>
-                 <View style={styles.postHeader}>
-                   <Image
-                     style={styles.postProfileImage}
-                     source={{
-                       uri:
-                         post?.user?.profilePicture ||
-                         "https://cdn-icons-png.flaticon.com/128/149/149071.png",
-                     }}
-                   />
-                   <Text style={styles.postUserName}>
-                     {post?.user?.name || "Anonymous"}
-                   </Text>
-                 </View>
-                 <Text style={styles.postContent}>
-                   {post.content || "No content"}
-                 </Text>
-                 <View style={styles.postActions}>
-                   {/* Like/Unlike */}
-                   {post.likes?.includes(userId) ? (
-                     <Animated.View
-                       style={{ transform: [{ scale: likeScale }] }}
-                     >
-                       <AntDesign
-                         onPress={() => handleUnlike(post._id)}
-                         name="heart"
-                         size={22}
-                         color="red"
-                       />
-                     </Animated.View>
-                   ) : (
-                     <AntDesign
-                       onPress={() => handleLike(post._id)}
-                       name="hearto"
-                       size={22}
-                       color="gray"
-                     />
-                   )}
-                   {/* Comments Toggle */}
+  return (
+    <View style={{ flex: 1, backgroundColor: "#F5F7FA" }}>
+      <ScrollView style={styles.container}>
+        {/* Header */}
+        <Animatable.View
+          animation="fadeInDown"
+          duration={1000}
+          style={styles.header}
+        >
+          <Image
+            style={styles.profileImage}
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
+            }}
+          />
+          <Text style={styles.appName}>Campus Connect</Text>
+          <View style={styles.headerIcons}>
+            <Ionicons
+              onPress={() => navigation.navigate("Chats")}
+              name="chatbox-ellipses-outline"
+              size={28}
+              color="#fff"
+              style={styles.icon}
+            />
+            <MaterialIcons
+              onPress={handleLogout}
+              name="logout"
+              size={28}
+              color="#fff"
+              style={styles.icon}
+            />
+          </View>
+        </Animatable.View>
 
-                   <FontAwesome
-                     name={
-                       visibleComments[post._id] ? "comment" : "comment-o"
-                     }
-                     size={22}
-                     color="gray"
-                     onPress={() => toggleComments(post._id)}
-                   />
-                   <Ionicons
-                     name="share-social-outline"
-                     size={22}
-                     color="gray"
-                   />
-                 </View>
-                 <Text style={styles.postFooter}>
-                   {post.likes?.length || 0} Kudos | {post.replies?.length || 0}{" "}
-                   Insights
-                 </Text>
+        {/* Posts */}
+        <View style={styles.postsContainer}>
+          {posts && posts.length > 0 ? (
+            posts.map((post) => (
+              <Animatable.View
+                key={post._id}
+                animation="fadeInUp"
+                duration={1000}
+                style={styles.postCard}
+              >
+                <View style={styles.postHeader}>
+                  <Image
+                    style={styles.postProfileImage}
+                    source={{
+                      uri:
+                        post?.user?.profilePicture ||
+                        "https://cdn-icons-png.flaticon.com/128/149/149071.png",
+                    }}
+                  />
+                  <Text style={styles.postUserName}>
+                    {post?.user?.name || "Anonymous"}
+                  </Text>
+                  <Menu>
+                    <MenuTrigger>
+                      <Ionicons
+                        name="ellipsis-vertical"
+                        size={20}
+                        color="black"
+                      />
+                    </MenuTrigger>
+                    <MenuOptions>
+                      <MenuOption
+                        onSelect={() => setModalVisible(true)}
+                        text="Report"
+                      />
+                    </MenuOptions>
+                  </Menu>
+                </View>
+                <Text style={styles.postContent}>
+                  {post.content || "No content"}
+                </Text>
+                {/* Report Modal */}
+                <Modal
+                  visible={modalVisible}
+                  animationType="slide"
+                  transparent={true}
+                >
+                  <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                      <Text style={styles.modalTitle}>Report Post</Text>
+                      <TextInput
+                        placeholder="Enter reason..."
+                        style={styles.input}
+                        value={reportReason}
+                        onChangeText={setReportReason}
+                      />
+                      <View style={styles.buttonContainer}>
+                        <Button
+                          title="Cancel"
+                          onPress={() => setModalVisible(false)}
+                        />
+                        <Button title="Submit" onPress={submitReport} />
+                      </View>
+                    </View>
+                  </View>
+                </Modal>
+                <View style={styles.postActions}>
+                  {/* Like/Unlike */}
+                  {post.likes?.includes(userId) ? (
+                    <Animated.View
+                      style={{ transform: [{ scale: likeScale }] }}
+                    >
+                      <AntDesign
+                        onPress={() => handleUnlike(post._id)}
+                        name="heart"
+                        size={22}
+                        color="red"
+                      />
+                    </Animated.View>
+                  ) : (
+                    <AntDesign
+                      onPress={() => handleLike(post._id)}
+                      name="hearto"
+                      size={22}
+                      color="gray"
+                    />
+                  )}
+                  {/* Comments Toggle */}
+                  <FontAwesome
+                    name={visibleComments[post._id] ? "comment" : "comment-o"}
+                    size={22}
+                    color="gray"
+                    onPress={() => toggleComments(post._id)}
+                  />
+                  <Ionicons
+                    name="share-social-outline"
+                    size={22}
+                    color="gray"
+                  />
+                </View>
+                <Text style={styles.postFooter}>
+                  {post.likes?.length || 0} Kudos | {post.replies?.length || 0}{" "}
+                  Insights
+                </Text>
 
-                 {/* Comment Section */}
-                 {visibleComments[post._id] && (
-                   <View style={styles.commentsSection}>
-                     <Text style={styles.commentsTitle}>Comments:</Text>
-                     <ScrollView style={styles.commentsList}>
-                       {post.replies && post.replies.length > 0 ? (
-                         post.replies.map((replies, index) => (
-                           <View key={index} style={styles.comment}>
-                             <Text style={styles.commentAuthor}>
-                               {replies?.user?.name || "Anonymous"}:
-                             </Text>
-                             <Text style={styles.commentText}>
-                               {replies?.content || ""}
-                             </Text>
-                           </View>
-                         ))
-                       ) : (
-                         <Text>No comments yet</Text>
-                       )}
-                     </ScrollView>
-                     <View style={styles.commentInputContainer}>
-                       <TextInput
-                         style={styles.commentInput}
-                         placeholder="Add a comment..."
-                         value={commentInput[post._id] || ""}
-                         onChangeText={(text) =>
-                           setCommentInput((prev) => ({
-                             ...prev,
-                             [post._id]: text,
-                           }))
-                         }
-                       />
-                       <Button
-                         title="Post"
-                         onPress={() => {
-                           handleAddComment(
-                             post._id,
-                             commentInput[post._id] || ""
-                           );
-                           setCommentInput((prev) => ({
-                             ...prev,
-                             [post._id]: "",
-                           }));
-                         }}
-                       />
-                     </View>
-                   </View>
-                 )}
-               </View>
-             ))
-           ) : (
-             <Text>No posts available</Text>
-           )}
-         </View>
-       </ScrollView>
+                {/* Comment Section */}
+                {visibleComments[post._id] && (
+                  <View style={styles.commentsSection}>
+                    <Text style={styles.commentsTitle}>Comments:</Text>
+                    <ScrollView style={styles.commentsList}>
+                      {post.replies && post.replies.length > 0 ? (
+                        post.replies.map((replies, index) => (
+                          <View key={index} style={styles.comment}>
+                            <Text style={styles.commentAuthor}>
+                              {replies?.user?.name || "Anonymous"}:
+                            </Text>
+                            <Text style={styles.commentText}>
+                              {replies?.content || ""}
+                            </Text>
+                          </View>
+                        ))
+                      ) : (
+                        <Text>No comments yet</Text>
+                      )}
+                    </ScrollView>
+                    <View style={styles.commentInputContainer}>
+                      <TextInput
+                        style={styles.commentInput}
+                        placeholder="Add a comment..."
+                        placeholderTextColor="#999"
+                        value={commentInput[post._id] || ""}
+                        onChangeText={(text) =>
+                          setCommentInput((prev) => ({
+                            ...prev,
+                            [post._id]: text,
+                          }))
+                        }
+                      />
+                      <Cursor />
+                      <TouchableOpacity
+                        onPress={() => {
+                          handleAddComment(
+                            post._id,
+                            commentInput[post._id] || ""
+                          );
+                          setCommentInput((prev) => ({
+                            ...prev,
+                            [post._id]: "",
+                          }));
+                        }}
+                        style={{
+                          backgroundColor: "#6A11CB",
+                          padding: 10,
+                          borderRadius: 20,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ color: "#FFF", fontWeight: "bold" }}>
+                          Post
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </Animatable.View>
+            ))
+          ) : (
+            <Text>No posts available</Text>
+          )}
+        </View>
+      </ScrollView>
 
-       {/* Chatbot Icon */}
-       <TouchableOpacity
-         style={styles.chatbotIcon}
-         onPress={() => setIsChatbotOpen(true)}
-       >
-         <Ionicons name="chatbubbles" size={28} color="#fff" />
-       </TouchableOpacity>
+      {/* Chatbot Icon */}
+      <TouchableOpacity
+        style={styles.chatbotIcon}
+        onPress={() => setIsChatbotOpen(true)}
+      >
+        <Ionicons name="chatbubbles" size={28} color="#fff" />
+      </TouchableOpacity>
 
-       {/* Chatbot Modal */}
-       <Modal visible={isChatbotOpen} animationType="slide" transparent>
-         <View style={styles.chatbotModal}>
-           <View style={styles.chatbotHeader}>
-             <Text style={styles.chatbotTitle}>SmartBuddy</Text>
-             <TouchableOpacity onPress={() => setIsChatbotOpen(false)}>
-               <Ionicons name="close" size={28} color="#333" />
-             </TouchableOpacity>
-           </View>
+      {/* Chatbot Modal */}
+      <Modal visible={isChatbotOpen} animationType="slide" transparent>
+        <View style={styles.chatbotModal}>
+          <View style={styles.chatbotHeader}>
+            <Text style={styles.chatbotTitle}>SmartBuddy</Text>
+            <TouchableOpacity onPress={() => setIsChatbotOpen(false)}>
+              <Ionicons name="close" size={28} color="#333" />
+            </TouchableOpacity>
+          </View>
 
-           <ScrollView style={styles.chatMessages}>
-             {chatMessages.map((msg, index) => (
-               <View
-                 key={index}
-                 style={
-                   msg.sender === "user"
-                     ? styles.userMessage
-                     : styles.botMessage
-                 }
-               >
-                 <Text>{msg.text}</Text>
-               </View>
-             ))}
-           </ScrollView>
+          <ScrollView style={styles.chatMessages}>
+            {chatMessages.map((msg, index) => (
+              <View
+                key={index}
+                style={
+                  msg.sender === "user" ? styles.userMessage : styles.botMessage
+                }
+              >
+                <Text>{msg.text}</Text>
+              </View>
+            ))}
+          </ScrollView>
 
-           <View style={styles.chatInputContainer}>
-             <TextInput
-               style={styles.chatInput}
-               placeholder="Type your message..."
-               value={userMessage}
-               onChangeText={setUserMessage}
-             />
-             <Button title="Send" onPress={handleSendMessage} />
-           </View>
-         </View>
-       </Modal>
-     </View>
-   );
+          <View style={styles.chatInputContainer}>
+            <TextInput
+              style={styles.chatInput}
+              placeholder="Type your message..."
+              value={userMessage}
+              onChangeText={setUserMessage}
+            />
+            <Button title="Send" onPress={handleSendMessage} />
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
 };
 
 export default HomeScreen;
@@ -479,17 +568,17 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ECEFF1", // Light background for contrast
+    backgroundColor: "#F5F7FA",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
-    backgroundColor: "linear-gradient(90deg, #6A11CB, #2575FC)", // Attractive gradient
+    backgroundColor: "#6A11CB",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    elevation: 4, // Add a shadow effect
+    elevation: 4,
   },
   profileImage: {
     width: 50,
@@ -498,6 +587,28 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#fff",
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonContainer: { flexDirection: "row", justifyContent: "space-between" },
+
+  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
   appName: {
     flex: 1,
     textAlign: "center",
@@ -505,7 +616,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#fff",
     letterSpacing: 1.5,
-    fontFamily: "Roboto", // Modern font
+    fontFamily: "Poppins",
   },
   headerIcons: {
     flexDirection: "row",
@@ -529,7 +640,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
     borderWidth: 1,
-    borderColor: "#E0E0E0", // Light border
+    borderColor: "#E0E0E0",
   },
   postHeader: {
     flexDirection: "row",
@@ -546,13 +657,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#333",
-    fontFamily: "Roboto",
+    fontFamily: "Poppins",
   },
   postContent: {
     fontSize: 14,
     color: "#555",
     marginBottom: 10,
-    fontFamily: "Roboto",
+    fontFamily: "Poppins",
   },
   postActions: {
     flexDirection: "row",
@@ -640,10 +751,14 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#F9F9F9",
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
   },
   commentsTitle: {
     fontWeight: "bold",
     marginBottom: 5,
+    color: "#333",
+    fontSize: 14,
   },
   commentsList: {
     maxHeight: 100,
@@ -653,24 +768,54 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: 5,
+    padding: 8,
+    backgroundColor: "#FFF",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
   },
   commentAuthor: {
     fontWeight: "bold",
     marginRight: 5,
+    color: "#6A11CB",
   },
   commentText: {
     flex: 1,
+    color: "#555",
   },
   commentInputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 10,
   },
   commentInput: {
     flex: 1,
     borderWidth: 1,
     borderColor: "#CCC",
-    borderRadius: 5,
-    padding: 5,
-    marginRight: 5,
+    borderRadius: 20,
+    padding: 10,
+    marginRight: 10,
+    backgroundColor: "#FFF",
+    fontSize: 14,
+    color: "#333",
+  },
+
+  // Cursor Animation
+  cursor: {
+    width: 2,
+    height: 20,
+    backgroundColor: "#6A11CB",
+    marginLeft: 5,
+  },
+
+  // Unique Animations
+  fadeIn: {
+    opacity: 0,
+    transform: [{ translateY: 10 }],
+  },
+  fadeInActive: {
+    opacity: 1,
+    transform: [{ translateY: 0 }],
+    transition: "opacity 0.3s ease, transform 0.3s ease",
   },
 });
