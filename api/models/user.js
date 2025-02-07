@@ -28,8 +28,15 @@ const userSchema = new mongoose.Schema({
     type: String,
   },
   passingYear: {
-    type:String,
+    type: String,
   },
+  user_type: { type: String, enum: ["faculty", "student"], default: "student" },
+  account_status: {
+    type: String,
+    enum: ["active", "deactivate", "suspended"],
+    default: "active",
+  },
+  online_status: { type: Boolean, default: false },
   joinedDate: { type: Date, default: Date.now },
   sentFollowRequest: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   receivedFollowRequests: [
