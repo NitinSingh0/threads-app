@@ -18,6 +18,7 @@ import OverviewScreen from "./screens/OverviewScreen";
 import FriendsScreen from "./screens/FriendsScreen";
 import ChatMessagesScreen from "./screens/ChatMessagesScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
+import PollScreen from "./screens/PollScreen";
 
 // Add animation for stack transitions
 const StackNavigator = () => {
@@ -104,10 +105,10 @@ const StackNavigator = () => {
           }}
         /> */}
         <Tab.Screen
-          name="Message"
-          component={ChatsScreen}
+          name="Poll"
+          component={PollScreen}
           options={{
-            tabBarLabel: "Chat Room",
+            tabBarLabel: "Poll",
             tabBarLabelStyle: { color: "black", fontSize: 12 },
             headerShown: false,
             tabBarIcon: ({ focused }) => (
