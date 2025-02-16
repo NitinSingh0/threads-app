@@ -17,6 +17,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { ScrollView } from "react-native-gesture-handler";
+import moment from "moment";
 
 const ProfileScreen = () => {
   const [user, setUser] = useState({
@@ -79,12 +80,12 @@ const ProfileScreen = () => {
               <Image
                 style={styles.profilePicture}
                 source={{
-                  uri: user?.image,
+                  uri: user?.profilePicture || user?.image,
                 }}
               />
-              <Text style={styles.username}>{user?.name}</Text>
+              <Text style={styles.username}>{user?.name || "Unknown"}</Text>
               <View style={styles.collegeBadge}>
-                <Text style={styles.collegeName}>Threds.net</Text>
+                <Text style={styles.collegeName}>{user?.user_type}</Text>
               </View>
             </View>
           </View>
@@ -93,7 +94,7 @@ const ProfileScreen = () => {
             <View style={styles.academicInfo}>
               <Text style={styles.academicText}>Course: {user?.course}</Text>
               <Text style={styles.academicText}>
-                Department: Computer Science
+                Joined on {moment(user?.joinedDate).format("MMMM D, YYYY")}
               </Text>
               <Text style={styles.academicText}>
                 Passing Year: {user?.passingYear}
@@ -107,23 +108,23 @@ const ProfileScreen = () => {
             </View>
 
             <Text style={styles.followersCount}>
-              {user?.followers?.length} followers
+              {user?.followers?.length || "5"} followers
             </Text>
           </View>
 
           <View style={styles.statsSection}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statNumber}>5</Text>
               {/* {posts.length} */}
               <Text style={styles.statLabel}>Posts</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{0}</Text>
+              <Text style={styles.statNumber}>{10}</Text>
               {/* user?.followers?.length */}
               <Text style={styles.statLabel}>Followers</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{user?.followingCount}</Text>
+              <Text style={styles.statNumber}>{user?.followingCount || "10"}</Text>
               <Text style={styles.statLabel}>Following</Text>
             </View>
           </View>

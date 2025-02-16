@@ -4,15 +4,18 @@ import StackNavigator from "./StackNavigator";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { UserContext } from './UserContext';
 import { MenuProvider } from "react-native-popup-menu";
+import UserProvider from "./context/UserContext";
 
 export default function App() {
   return (
     <MenuProvider>
-      <UserContext>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <StackNavigator />
-        </GestureHandlerRootView>
-      </UserContext>
+      <UserProvider>
+        <UserContext>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <StackNavigator />
+          </GestureHandlerRootView>
+        </UserContext>
+      </UserProvider>
     </MenuProvider>
   );
 }

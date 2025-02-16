@@ -14,11 +14,13 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import ActivityScreen from "./screens/ActivityScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ChatsScreen from "./screens/ChatsScreen";
-import OverviewScreen from "./screens/OverviewScreen";
+import EnterOTP from "./screens/EnterOtp";
 import FriendsScreen from "./screens/FriendsScreen";
 import ChatMessagesScreen from "./screens/ChatMessagesScreen";
 import EditProfileScreen from "./screens/EditProfileScreen";
 import PollScreen from "./screens/PollScreen";
+import ForgotPasswordScreen from "./screens/ForgotPassword";
+import ResetPassword from "./screens/ResetPassword";
 
 // Add animation for stack transitions
 const StackNavigator = () => {
@@ -168,6 +170,22 @@ const StackNavigator = () => {
         <Stack.Screen
           name="Main"
           component={BottomTabs}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPasswordScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EnterOTP"
+          component={EnterOTP}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="ResetPassword"
+          component={ResetPassword}
           options={{ headerShown: false }}
         />
         <Stack.Screen

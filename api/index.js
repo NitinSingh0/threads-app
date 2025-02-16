@@ -114,6 +114,9 @@ app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    if (user.account_status == "suspended") {
+      return res.status(404).json({ message: "Your account is suspended!" });
+    }
     if (!user) {
       return res.status(404).json({ message: "Invallid email or password" });
     }
@@ -643,5 +646,111 @@ app.get("/polls/:userId", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching poll details : ", error: err.message });
+  }
+});
+
+//Get Poll by id /polls/${userId}/${pollId}
+app.get("/polls/:userId/:pollId", async (req, res) => {
+  const { userId, pollId } = req.params; // Extract userId and pollId from URL
+
+  try {
+    const poll = await Poll.findById(pollId)
+      .populate("creator", "username email")
+      .populate({
+        path: "responses.voterId",
+        select: "username profileImageUrl name",
+      });
+
+    if (!poll) {
+      return res.status(404).json({ message: "Poll not found" });
+    }
+
+    res.status(200).json(poll);
+  } catch (err) {
+    res.status(500).json({
+      message: "Server error while fetching poll",
+      error: err.message,
+    });
+  }
+});
+
+//Vote on Poll
+app.post("/polls/:userId/:pollId/vote", async (req, res) => {
+  const { userId, pollId } = req.params;
+  const { optionIndex, voterId, responseText } = req.body;
+  console.log("USer is ", userId);
+  try {
+    const poll = await Poll.findById(pollId);
+    if (!poll) {
+      return res.status(404).json({ message: "Poll not found" });
+    }
+    if (poll.closed) {
+      return res.status(400).json({ message: "Poll is closed" });
+    }
+    if (poll.voters.includes(voterId)) {
+      return res
+        .status(400)
+        .json({ message: "User has already voted on this poll." });
+    }
+
+    if (poll.type === "open-ended") {
+      if (!responseText) {
+        return res
+          .status(400)
+          .json({ message: "Response text is required for open-ended polls." });
+      }
+      poll.responses.push({ voterId, responseText });
+    } else {
+      if (
+        optionIndex === undefined ||
+        optionIndex < 0 ||
+        optionIndex >= poll.options.length
+      ) {
+        return res.status(400).json({ message: "Invalid option index." });
+      }
+      poll.options[optionIndex].votes += 1;
+    }
+
+    poll.voters.push(voterId);
+    await poll.save();
+    res.status(200).json(poll);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error while voting on poll", error: err.message });
+  }
+});
+
+app.get("/polls/:userId/:pollId/bookmark", async (req, res) => {
+  const { userId, pollId } = req.params;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    //Check if poll is already booked
+    const isBookmarked = user.bookmarkedPolls.includes(pollId);
+    if (isBookmarked) {
+      //remove poll from bookmarks
+      user.bookmarkedPolls = user.bookmarkedPolls.filter(
+        (pollId) => pollId.toString() !== pollId
+      );
+      await user.save();
+      return res.status(200).json({
+        message: "Poll removed from bookmarks",
+        bookmarkedPolls: user.bookmarkedPolls,
+      });
+    }
+    //Add poll to bookmarks
+    user.bookmarkedPolls.push(pollId);
+    await user.save();
+    res.status(200).json({
+      message: "Poll bookmarked successfully",
+      bookmarkedPolls: user.bookmarkedPolls,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error Bookmarking poll", error: err.message });
   }
 });

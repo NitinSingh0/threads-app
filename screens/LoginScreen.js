@@ -89,7 +89,9 @@ const LoginScreen = () => {
         </View>
         <View style={styles.optionsRow}>
           <Text style={styles.optionText}>Keep me logged in</Text>
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
+          <Pressable onPress={() => navigation.navigate("ForgotPassword")}>
+            <Text style={styles.forgotPassword}>Forgot Password?</Text>
+          </Pressable>
         </View>
         <Pressable style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>

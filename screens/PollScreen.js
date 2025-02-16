@@ -5,21 +5,20 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-//import useUserAuth from "../../hooks/useUserAuth";
 import axios from "axios";
-import PollCard from "../components/PollCard"; // Ensure PollCard.js exists
-import HeaderWithFilter from "../components/HeaderWithFilter"; // Ensure HeaderWithFilter.js exists
+import PollCard from "../components/PollCard";
+import HeaderWithFilter from "../components/HeaderWithFilter";
 import { UserType } from "../UserContext";
 
 const PAGE_SIZE = 3;
-const BASE_URL = "http://10.0.2.2:3000"; // Update this if needed
+const BASE_URL = "http://10.0.2.2:3000";
 
 const PollScreen = () => {
-  //useUserAuth();
   const navigation = useNavigation();
-
   const [allPolls, setAllPolls] = useState([]);
   const [stats, setStats] = useState([]);
   const [page, setPage] = useState(1);
@@ -27,11 +26,11 @@ const PollScreen = () => {
   const [loading, setLoading] = useState(false);
   const [filterType, setFilterType] = useState("");
   const { userId } = useContext(UserType);
+
   const fetchAllPolls = async (overridePage = page) => {
     if (loading) return;
     setLoading(true);
     try {
-      
       const response = await axios.get(
         `${BASE_URL}/polls/${userId}?page=${overridePage}&limit=${PAGE_SIZE}&type=${filterType}`
       );
@@ -72,9 +71,9 @@ const PollScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <HeaderWithFilter
-        title="Polls"
+        title="Admin Polls"
         filterType={filterType}
         setFilterType={setFilterType}
       />
@@ -98,7 +97,7 @@ const PollScreen = () => {
           />
         )}
         ListFooterComponent={
-          loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+          loading ? <ActivityIndicator size="large" color="#4CAF50" /> : null
         }
         onEndReached={loadMorePolls}
         onEndReachedThreshold={0.1}
@@ -106,20 +105,22 @@ const PollScreen = () => {
       {!hasMore && (
         <Text style={styles.infoText}>No more polls to display.</Text>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    backgroundColor: "#fff",
+    padding: 15,
+    backgroundColor: "#E3F2FD",
   },
   infoText: {
     textAlign: "center",
-    padding: 10,
-    color: "gray",
+    padding: 15,
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#1976D2",
   },
 });
 

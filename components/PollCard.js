@@ -1,15 +1,13 @@
 import React, { useCallback, useContext, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { UserContext } from "../context/UserContext";
-//import { getPollBookmarked } from "../../utils/helper";
-
 import UserProfileInfo from "./UserProfileInfo";
 import PollAction from "./PollAction";
 import PollContent from "./PollContent";
-
 import Toast from "react-native-toast-message";
 import PollingResultContent from "./PollingResultContent";
 import { UserType } from "../UserContext";
+import axios from "axios";
 
 const PollCard = ({
   pollId,
@@ -26,76 +24,38 @@ const PollCard = ({
   isPollClosed,
   createdAt,
 }) => {
-    const { userId } = useContext(UserType);
+  const BASE_URL = "http://10.0.2.2:3000";
+  const { userId } = useContext(UserType);
   const { user, onUserVoted, toggleBookmarkId } = useContext(UserContext);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(-1);
   const [rating, setRating] = useState(0);
   const [userResponse, setUserResponse] = useState("");
   const [isVoteComplete, setIsVoteComplete] = useState(userHasVoted);
-  const [pollResult, setPollResult] = useState({
-    options,
-    voters,
-    responses,
-  });
-    const getPollBookmarked = (pollId, userBookmarks = []) => {
-      return userBookmarks.includes(pollId);
-    };
-  const isPollBookmarked = getPollBookmarked(
-    pollId,
-    user.bookmarkedPolls || []
-  );
+  const [pollResult, setPollResult] = useState({ options, voters, responses });
+  const isPollBookmarked = user?.bookmarkedPolls?.includes(pollId) || false;
   const [pollBookmarked, setPollBookmarked] = useState(isPollBookmarked);
   const [pollClosed, setPollClosed] = useState(isPollClosed || false);
   const [pollDeleted, setPollDeleted] = useState(false);
 
-  // Handles user input based on the poll type
   const handleInput = (value) => {
     if (type === "rating") setRating(value);
     else if (type === "open-ended") setUserResponse(value);
     else setSelectedOptionIndex(value);
   };
 
-  // Generates post data based on the poll type
   const getPostData = useCallback(() => {
-    if (type === "open-ended") {
+    if (type === "open-ended")
       return { responseText: userResponse, voterId: userId };
-    }
-    if (type === "rating") {
-      return { optionIndex: rating - 1, voterId: userId };
-    }
+    if (type === "rating") return { optionIndex: rating - 1, voterId: userId };
     return { optionIndex: selectedOptionIndex, voterId: userId };
   }, [type, userResponse, rating, selectedOptionIndex, user]);
 
-  // Get Poll Details by ID
-  const getPollDetail = async () => {
-    try {
-      const response = await axiosInstance.get(
-        API_PATHS.POLLS.GET_BY_ID(pollId)
-      );
-
-      if (response.data) {
-        const pollDetails = response.data;
-        setPollResult({
-          options: pollDetails.options || [],
-          voters: pollDetails.voters.length || 0,
-          responses: pollDetails.responses || [],
-        });
-      }
-    } catch (error) {
-      console.error(
-        error.response?.data?.message || "Error fetching poll details"
-      );
-    }
-  };
-
-  // Handles the submission of votes
   const handleVoteSubmit = async () => {
     try {
-      const response = await axiosInstance.post(
-        API_PATHS.POLLS.VOTE(pollId),
+      await axios.post(
+        `${BASE_URL}/polls/${userId}/${pollId}/vote`,
         getPostData()
       );
-      getPollDetail();
       onUserVoted();
       setIsVoteComplete(true);
       Toast.show({ type: "success", text1: "Vote submitted successfully!" });
@@ -104,15 +64,12 @@ const PollCard = ({
     }
   };
 
-  // Toggles the bookmark status of a poll
   const toggleBookmark = async () => {
     try {
-      const response = await axiosInstance.post(
-        API_PATHS.POLLS.BOOKMARK(pollId)
-      );
+      await axios.post(`${BASE_URL}/polls/${userId}/${pollId}/bookmark`);
       toggleBookmarkId(pollId);
       setPollBookmarked((prev) => !prev);
-      Toast.show({ type: "success", text1: response.data.message });
+      Toast.show({ type: "success", text1: "Bookmark status updated!" });
     } catch (error) {
       console.error(error.response?.data?.message || "Error bookmarking poll");
     }
@@ -174,29 +131,35 @@ const PollCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#f1f5f9",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
+    backgroundColor: "rgb(255, 255, 255,0.2)",
+    padding: 20,
+    borderRadius: 15,
+    marginBottom: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    backdropFilter: "blur(10px)",
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   content: {
-    marginTop: 10,
+    marginTop: 12,
   },
   question: {
-    fontSize: 15,
+    fontSize: 16,
+    fontWeight: "bold",
     color: "#000",
-    lineHeight: 22,
-    marginBottom: 8,
+    lineHeight: 24,
+    marginBottom: 10,
   },
   pollContainer: {
-    marginTop: 8,
+    marginTop: 10,
   },
 });
 
