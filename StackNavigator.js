@@ -21,6 +21,8 @@ import EditProfileScreen from "./screens/EditProfileScreen";
 import PollScreen from "./screens/PollScreen";
 import ForgotPasswordScreen from "./screens/ForgotPassword";
 import ResetPassword from "./screens/ResetPassword";
+import GroupChat from "./screens/GroupChat";
+import GroupList from "./screens/GroupList";
 
 // Add animation for stack transitions
 const StackNavigator = () => {
@@ -175,6 +177,16 @@ const StackNavigator = () => {
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPasswordScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="GroupChat"
+          component={GroupChat}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="GroupList"
+          component={GroupList}
           options={{ headerShown: false }}
         />
         <Stack.Screen

@@ -8,6 +8,11 @@ const messageSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  groupId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Group",
+    default: null, // If null, it's a one-to-one message
+  },
   messageType: {
     type: String,
     enum: ["text", "image"],

@@ -37,6 +37,7 @@ const Post = require("./models/post");
 const Message = require("./models/message");
 const Poll = require("./models/Poll");
 const Report = require("./models/report");
+const Group = require("./models/group");
 
 //endpoint to register a user in the backend
 app.post("/register", async (req, res) => {
@@ -752,5 +753,114 @@ app.get("/polls/:userId/:pollId/bookmark", async (req, res) => {
     res
       .status(500)
       .json({ message: "Error Bookmarking poll", error: err.message });
+  }
+});
+
+//Grouup MEssaging
+
+// Create a new group
+app.post("/create", async (req, res) => {
+  try {
+    const { name, description, admin, members } = req.body;
+
+    console.log("Received Data:", req.body); // ✅ Log incoming request data
+
+    // Check if required fields are present
+    if (!name || !admin) {
+      return res
+        .status(400)
+        .json({ message: "Group name and adminId are required" });
+    }
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(admin)) {
+      return res.status(400).json({ message: "Invalid adminId format" });
+    }
+
+    const group = new Group({
+      name,
+      description: description || "", // Set default value if undefined
+      admin: admin,
+      members: [admin, ...(members || [])], // Ensure members exist
+    });
+
+    await group.save();
+    res.status(201).json(group);
+  } catch (error) {
+    console.error("Error creating group:", error);
+    res.status(500).json({ message: "Error creating group", error });
+  }
+});
+
+//Add members
+app.post("/add-members", async (req, res) => {
+  try {
+    const { groupId, members } = req.body;
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    group.members.push(...members);
+    await group.save();
+
+    res.json({ message: "Members added successfully", group });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding members", error });
+  }
+});
+
+//Send a group message
+app.post("/send-message", async (req, res) => {
+  try {
+    const { senderId, groupId, messageType, message, imageUrl } = req.body;
+
+    const newMessage = new Message({
+      senderId,
+      groupId,
+      messageType,
+      message,
+      imageUrl,
+    });
+
+    await newMessage.save();
+
+    await Group.findByIdAndUpdate(groupId, {
+      $push: { messages: newMessage._id },
+    });
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    res.status(500).json({ message: "Error sending message", error });
+  }
+});
+
+//Get a group message
+app.get("/:groupId/messages", async (req, res) => {
+  try {
+    const { groupId } = req.params;
+
+    const messages = await Message.find({ groupId }).populate(
+      "senderId",
+      "name profilePicture"
+    );
+
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching messages", error });
+  }
+});
+// 📌 Get User's Groups
+app.get("/groupList/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const groups = await Group.find({
+      members: userId, // Fetch only groups where user is a member
+    });
+
+    res.json(groups);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching groups" });
   }
 });

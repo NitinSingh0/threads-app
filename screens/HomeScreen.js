@@ -325,10 +325,17 @@ const HomeScreen = () => {
               uri: "https://cdn-icons-png.flaticon.com/128/149/149071.png",
             }}
           />
-          <Text style={styles.appName}>Campus Connect</Text>
+          <Text style={styles.appName}>Vaze Connect</Text>
           <View style={styles.headerIcons}>
             <Ionicons
               onPress={() => navigation.navigate("Chats")}
+              name="chatbox-ellipses-outline"
+              size={28}
+              color="#fff"
+              style={styles.icon}
+            />
+            <Ionicons
+              onPress={() => navigation.navigate("GroupList")}
               name="chatbox-ellipses-outline"
               size={28}
               color="#fff"
