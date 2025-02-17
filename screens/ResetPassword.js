@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -6,91 +6,153 @@ import {
   StyleSheet,
   TextInput,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
 
+const ResetPassword = () => {
+  const navigation = useNavigation();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
 
+  const handleSubmit = useCallback(() => {
+    if (!newPassword || !confirmPassword) {
+      setError("Both fields are required");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
 
-export default class ResetPassword extends Component {
-  render() {
-    return (
-      <KeyboardAvoidingView behavior="position" style={styles.mainCon}>
-        <LinearGradient colors={["#1a1a2e", "#16213e"]} style={styles.gradient}>
-          <View style={{ padding: 20 }}>
-            <Pressable onPress={() => this.props.navigation.goBack(null)}>
-              <Text style={styles.backText}>← Back</Text>
-            </Pressable>
-          </View>
-          <View style={styles.container}>
-            <Text style={styles.title}>Reset Password</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder={"New Password"}
-                placeholderTextColor={"#aaa"}
-                secureTextEntry={true}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder={"Confirm Password"}
-                placeholderTextColor={"#aaa"}
-                secureTextEntry={true}
-              />
-            </View>
-            <Pressable style={styles.button}>
-              <Text style={styles.buttonText}>Submit</Text>
-            </Pressable>
-          </View>
-        </LinearGradient>
-      </KeyboardAvoidingView>
-    );
-  }
-}
+    Alert.alert("Success", "Password has been reset!", [
+      { text: "OK", onPress: () => navigation.navigate("Main") },
+    ]);
+  }, [newPassword, confirmPassword]);
+
+  return (
+    <KeyboardAvoidingView behavior="height" style={styles.container}>
+      <View style={styles.gradient}>
+        <View style={styles.header}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>← Back</Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>Reset Password</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="New Password"
+            placeholderTextColor="#ddd"
+            secureTextEntry={true}
+            value={newPassword}
+            onChangeText={setNewPassword}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            placeholderTextColor="#ddd"
+            secureTextEntry={true}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <Pressable style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </Pressable>
+        </View>
+      </View>
+    </KeyboardAvoidingView>
+  );
+};
 
 const styles = StyleSheet.create({
-  mainCon: {
+  container: {
     flex: 1,
+    backgroundColor: "#0F172A", // Dark theme base
   },
   gradient: {
     flex: 1,
-    paddingHorizontal: 20,
     justifyContent: "center",
+    paddingHorizontal: 25,
+    backgroundColor: "linear-gradient(to bottom, #1E293B, #334155)", // Soft gradient effect
+  },
+  header: {
+    position: "absolute",
+    top: 50,
+    left: 20,
   },
   backText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+    textTransform: "uppercase",
   },
-  container: {
+  formContainer: {
     alignItems: "center",
   },
   title: {
-    color: "#fff",
+    color: "#FFF",
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
-  },
-  inputContainer: {
-    width: "100%",
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+    textShadowColor: "rgba(255, 255, 255, 0.5)",
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 5,
   },
   input: {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    width: "100%",
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
     color: "#fff",
     fontSize: 16,
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 15,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+    textAlign: "center",
+    shadowColor: "#fff",
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
   },
   button: {
     backgroundColor: "#ff4d6d",
     paddingVertical: 15,
-    paddingHorizontal: 50,
-    borderRadius: 25,
+    paddingHorizontal: 60,
+    borderRadius: 30,
     marginTop: 20,
+    shadowColor: "#ff4d6d",
+    shadowOpacity: 0.5,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 10,
+    elevation: 5,
   },
   buttonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+  },
+  errorText: {
+    color: "#ff4d6d",
+    fontSize: 14,
+    marginBottom: 10,
   },
 });
+
+export default ResetPassword;
