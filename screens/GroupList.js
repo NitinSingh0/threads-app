@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Modal,
   ScrollView,
+  Image,
 } from "react-native";
 import axios from "axios";
 import { UserType } from "../UserContext";
@@ -19,13 +20,14 @@ const GroupList = ({ navigation }) => {
   const [groups, setGroups] = useState([]);
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
-  const [members, setMembers] = useState([]);
+  const [friends, setFriends] = useState([]);
+  const [selectedFriends, setSelectedFriends] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newMember, setNewMember] = useState("");
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     fetchUserGroups();
+    fetchFriends();
   }, []);
 
   const fetchUserGroups = async () => {
@@ -37,45 +39,62 @@ const GroupList = ({ navigation }) => {
     }
   };
 
+  const fetchFriends = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/fetchFriendss/${userId}`);
+      setFriends(res.data);
+    } catch (error) {
+      console.error("Error fetching friends", error.message);
+    }
+  };
+
   const createGroup = async () => {
     if (!groupName.trim()) return;
+    // Check if group name already exists
+    const isDuplicate = groups.some(
+      (group) => group.name.toLowerCase() === groupName.toLowerCase()
+    );
+    if (isDuplicate) {
+      alert(
+        "A group with this name already exists. Please choose a different name."
+      );
+      return;
+    }
     try {
       const res = await axios.post(`${API_URL}/create`, {
         name: groupName,
         description,
-        members: [userId, ...members],
+        members: [userId, ...selectedFriends],
         admin: userId,
       });
       setGroups([...groups, res.data]);
       setGroupName("");
       setDescription("");
-      setMembers([]);
+      setSelectedFriends([]);
       setShowCreateForm(false);
     } catch (error) {
       console.error("Error creating group", error);
     }
   };
 
-  const addMember = () => {
-    if (newMember.trim()) {
-      setMembers([...members, newMember.trim()]);
-      setNewMember("");
-    }
+  const toggleSelectFriend = (friendId) => {
+    console.log(friendId);
+    setSelectedFriends((prevSelected) =>
+      prevSelected.includes(friendId)
+        ? prevSelected.filter((id) => id !== friendId)
+        : [...prevSelected, friendId]
+    );
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Your Groups</Text>
-
-      {/* Go Back Button */}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
         <Text style={styles.backText}>◀ Go Back</Text>
       </TouchableOpacity>
-
-      {/* Create Group Icon */}
       <TouchableOpacity
         style={styles.createIcon}
         onPress={() => setShowCreateForm(!showCreateForm)}
@@ -109,48 +128,53 @@ const GroupList = ({ navigation }) => {
         </ScrollView>
       )}
 
-      {/* Display Groups */}
       <FlatList
         data={groups}
         keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.groupItem}
-            onPress={() =>
-              navigation.navigate("GroupChat", { groupId: item._id })
-            }
-          >
-            <Text style={styles.groupName}>{item.name}</Text>
-            <Text style={styles.groupDescription}>{item.description}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => {
+          if (!item) return null; // Ensure item is not undefined/null
+
+          return (
+            <TouchableOpacity
+              style={styles.groupItem}
+              onPress={() =>
+                navigation.navigate("GroupChat", { groupId: item._id })
+              }
+            >
+              <Text style={styles.groupName}>{item.name}</Text>
+              <Text style={styles.groupDescription}>{item.description}</Text>
+            </TouchableOpacity>
+          );
+        }}
       />
 
-      {/* Modal for Adding Members */}
       <Modal visible={modalVisible} animationType="slide">
         <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Add Members</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Member ID"
-            value={newMember}
-            onChangeText={setNewMember}
-          />
-          <TouchableOpacity style={styles.button} onPress={addMember}>
-            <Text style={styles.buttonText}>Add</Text>
-          </TouchableOpacity>
+          <Text style={styles.modalTitle}>Select Friends</Text>
           <FlatList
-            data={members}
-            keyExtractor={(item, index) => index.toString()}
+            data={friends}
+            keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
-              <Text style={styles.memberItem}>{item}</Text>
+              <TouchableOpacity
+                style={styles.friendItem}
+                onPress={() => toggleSelectFriend(item._id)}
+              >
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.friendImage}
+                />
+                <Text style={styles.friendName}>{item.name}</Text>
+                <Text style={styles.checkboxText}>
+                  {selectedFriends.includes(item._id) ? "✔" : ""}
+                </Text>
+              </TouchableOpacity>
             )}
           />
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => setModalVisible(false)}
           >
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={styles.closeButtonText}>Done</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -210,6 +234,18 @@ const styles = StyleSheet.create({
   modalContainer: { flex: 1, padding: 20, backgroundColor: "#FFF" },
   modalTitle: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
   memberItem: { padding: 8, fontSize: 16, color: "#333" },
+
+  friendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#252540",
+    borderRadius: 8,
+    marginBottom: 5,
+  },
+  friendImage: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
+  friendName: { flex: 1, fontSize: 16, color: "#FFF" },
+  checkboxText: { fontSize: 18, color: "#FFD700" },
   closeButton: {
     marginTop: 10,
     backgroundColor: "#FF5733",

@@ -759,6 +759,7 @@ app.get("/polls/:userId/:pollId/bookmark", async (req, res) => {
 //Grouup MEssaging
 
 // Create a new group
+
 app.post("/create", async (req, res) => {
   try {
     const { name, description, admin, members } = req.body;
@@ -862,5 +863,68 @@ app.get("/groupList/:userId", async (req, res) => {
     res.json(groups);
   } catch (error) {
     res.status(500).json({ error: "Error fetching groups" });
+  }
+});
+
+//get users friend
+app.get("/fetchFriendss/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).populate("friends", "_id name image");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user.friends);
+  } catch (error) {
+    console.error("Error fetching friends:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+// 📌 1️⃣ Fetch Group Details
+app.get("/groups/:groupId", async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.groupId).populate("admin", "_id name profilePicture") // Populate admin details
+      .populate("members", "_id name profilePicture");
+    if (!group) return res.status(404).json({ error: "Group not found" });
+    res.json(group);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching group details" });
+  }
+});
+
+// 📌 2️⃣ Fetch Group Messages groups/${groupId}/messages
+app.get("/groups/:groupId/messages", async (req, res) => {
+  try {
+    const messages = await Message.find({ groupId: req.params.groupId }).populate("senderId", "name profilePicture");
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching messages" });
+  }
+});
+
+//  Fetch User Details
+app.get("/users/:userId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching user details" });
+  }
+});
+
+// Send Message
+app.post("/send-message", async (req, res) => {
+  try {
+    const { senderId, groupId, message, messageType } = req.body;
+
+    const newMessage = new Message({ senderId, groupId, message, messageType });
+    await newMessage.save();
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    res.status(500).json({ error: "Error sending message" });
   }
 });

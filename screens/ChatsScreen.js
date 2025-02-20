@@ -28,6 +28,12 @@ const ChatsScreen = () => {
   console.log("Friends : ", acceptedFriends);
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
+      <Pressable
+        style={styles.groupChatButton}
+        onPress={() => navigation.navigate("GroupList")}
+      >
+        <Text style={styles.groupChatText}>Go to Group Chats</Text>
+      </Pressable>
       <Pressable>
         {acceptedFriends.map((item, index) => (
           <UserChat key={index} item={item} />
@@ -39,4 +45,17 @@ const ChatsScreen = () => {
 
 export default ChatsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  groupChatButton: {
+    backgroundColor: "#007bff",
+    padding: 12,
+    margin: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  groupChatText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
