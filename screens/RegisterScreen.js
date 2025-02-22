@@ -13,7 +13,6 @@ import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 
@@ -24,29 +23,17 @@ const RegisterScreen = () => {
   const navigation = useNavigation();
 
   const handleRegister = () => {
-    const user = {
-      name: name,
-      email: email,
-      password: password,
-    };
+    const user = { name, email, password };
     axios
       .post("http://10.0.2.2:3000/register", user)
-      .then((response) => {
-        console.log(response);
-        Alert.alert(
-          "Registration successful",
-          "You have been registered successfully"
-        );
+      .then(() => {
+        Alert.alert("Success", "You have been registered successfully");
         setName("");
         setEmail("");
         setPassword("");
       })
-      .catch((error) => {
-        Alert.alert(
-          "Registration failed",
-          "An error occurred during registration"
-        );
-        console.log("error", error.response?.data || error.message);
+      .catch(() => {
+        Alert.alert("Error", "Registration failed. Please try again.");
       });
   };
 
@@ -55,64 +42,59 @@ const RegisterScreen = () => {
       <View style={styles.logoContainer}>
         <Image style={styles.logo} source={require("../assets/icon.png")} />
       </View>
-      <KeyboardAvoidingView>
+      <KeyboardAvoidingView style={styles.formContainer}>
         <View style={styles.inputWrapper}>
-          <Text style={styles.title}>Create your Account</Text>
-
-          {/* Name Input */}
+          <Text style={styles.title}>Create Your Account</Text>
           <View style={styles.inputContainer}>
             <Ionicons
-              style={styles.icon}
               name="person"
               size={24}
-              color="gray"
+              color="#ffb703"
+              style={styles.icon}
             />
             <TextInput
               value={name}
-              onChangeText={(text) => setName(text)}
-              placeholderTextColor="gray"
-              style={styles.input}
+              onChangeText={setName}
               placeholder="Enter your name"
+              placeholderTextColor="#aaa"
+              style={styles.input}
             />
           </View>
-
-          {/* Email Input */}
           <View style={styles.inputContainer}>
             <MaterialIcons
-              style={styles.icon}
               name="email"
               size={24}
-              color="gray"
+              color="#fb8500"
+              style={styles.icon}
             />
             <TextInput
               value={email}
-              onChangeText={(text) => setEmail(text)}
-              placeholderTextColor="gray"
-              style={styles.input}
+              onChangeText={setEmail}
               placeholder="Enter your email"
+              placeholderTextColor="#aaa"
+              style={styles.input}
             />
           </View>
-
-          {/* Password Input */}
           <View style={styles.inputContainer}>
-            <AntDesign style={styles.icon} name="lock" size={24} color="gray" />
+            <AntDesign
+              name="lock"
+              size={24}
+              color="#219ebc"
+              style={styles.icon}
+            />
             <TextInput
               secureTextEntry
               value={password}
-              onChangeText={(text) => setPassword(text)}
-              placeholderTextColor="gray"
-              style={styles.input}
+              onChangeText={setPassword}
               placeholder="Enter your password"
+              placeholderTextColor="#aaa"
+              style={styles.input}
             />
           </View>
         </View>
-
-        {/* Register Button */}
         <Pressable onPress={handleRegister} style={styles.button}>
           <Text style={styles.buttonText}>Register</Text>
         </Pressable>
-
-        {/* Navigate to Login */}
         <Pressable
           onPress={() => navigation.goBack()}
           style={styles.linkContainer}
@@ -129,63 +111,78 @@ export default RegisterScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#1e1e2e",
     alignItems: "center",
+    justifyContent: "center",
   },
   logoContainer: {
-    marginTop: 50,
+    marginBottom: 20,
   },
   logo: {
-    width: 250,
-    height: 200,
+    width: 220,
+    height: 180,
     resizeMode: "contain",
+  },
+  formContainer: {
+    width: "90%",
+    backgroundColor: "#2b2b3a",
+    padding: 25,
+    borderRadius: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    marginTop: 0,
   },
   inputWrapper: {
     alignItems: "center",
-    justifyContent: "center",
-    marginTop: 5,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 17,
+    fontSize: 22,
     fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 25,
+    color: "#ffd166",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderColor: "#D0D0D0",
     borderWidth: 1,
-    borderRadius: 5,
-    paddingVertical: 5,
-    marginTop: 30,
+    borderColor: "#555",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    marginBottom: 20,
+    backgroundColor: "#3b3b4f",
   },
   icon: {
-    marginLeft: 8,
+    marginRight: 10,
   },
   input: {
-    color: "gray",
-    marginVertical: 10,
-    width: 300,
+    flex: 1,
+    marginLeft: 10,
+    color: "#fff",
     fontSize: 16,
   },
   button: {
-    width: 200,
-    backgroundColor: "black",
-    padding: 15,
-    borderRadius: 6,
-    marginTop: 40,
-    alignSelf: "center",
+    backgroundColor: "#4a90e2",
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginBottom: 20,
   },
   buttonText: {
     textAlign: "center",
+    color: "#fff",
+    fontSize: 18,
     fontWeight: "bold",
-    color: "white",
   },
   linkContainer: {
-    marginTop: 10,
+    marginTop: 15,
   },
   linkText: {
-    textAlign: "center",
     fontSize: 16,
-    color: "#007FFF",
+    color: "#f4a261",
+    textAlign: "center",
   },
 });

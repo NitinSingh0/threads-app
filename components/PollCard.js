@@ -131,7 +131,7 @@ const PollCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "rgb(255, 255, 255,0.2)",
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 15,
     marginBottom: 15,

@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
-    backgroundColor: "#E3F2FD",
+    backgroundColor: "#1e1e2e",
   },
   infoText: {
     textAlign: "center",

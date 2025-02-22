@@ -185,12 +185,17 @@ const GroupList = ({ navigation }) => {
 export default GroupList;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#1E1E2E", padding: 20 },
-  header: { fontSize: 26, fontWeight: "bold", color: "#FFF", marginBottom: 10 },
+  container: { flex: 1, backgroundColor: "#F0F0F0", padding: 20 },
+  header: {
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#4a90e2",
+    marginBottom: 10,
+  },
   backButton: { marginBottom: 15 },
-  backText: { color: "#FFD700", fontSize: 16 },
+  backText: { color: "#ffd166", fontSize: 16 },
   createIcon: { marginBottom: 10, alignItems: "center" },
-  createIconText: { fontSize: 18, color: "#FFD700", fontWeight: "bold" },
+  createIconText: { fontSize: 18, color: "#ffd166", fontWeight: "bold" },
   formContainer: {
     backgroundColor: "#FFF",
     padding: 15,

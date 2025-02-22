@@ -67,23 +67,23 @@ const LoginScreen = () => {
       <KeyboardAvoidingView style={styles.formContainer}>
         <Text style={styles.title}>Sign In to Your Account</Text>
         <View style={styles.inputContainer}>
-          <MaterialIcons name="email" size={24} color="#6A11CB" />
+          <MaterialIcons name="email" size={24} color="#4a90e2" />
           <TextInput
             value={email}
             onChangeText={setEmail}
             placeholder="Enter your email"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="#ddd"
             style={styles.input}
           />
         </View>
         <View style={styles.inputContainer}>
-          <AntDesign name="lock" size={24} color="#6A11CB" />
+          <AntDesign name="lock" size={24} color="#4a90e2" />
           <TextInput
             secureTextEntry
             value={password}
             onChangeText={setPassword}
             placeholder="Enter your password"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="#ddd"
             style={styles.input}
           />
         </View>
@@ -112,51 +112,51 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "#1e1e2e",
     alignItems: "center",
     justifyContent: "center",
   },
   logoContainer: {
-    marginBottom: 5,
+    marginBottom: 10,
   },
   logo: {
-    width: 250,
-    height: 200,
+    width: 220,
+    height: 180,
     resizeMode: "contain",
   },
   formContainer: {
-    width: "85%",
-    backgroundColor: "#fff",
-    padding: 20,
+    width: "90%",
+    backgroundColor: "#2b2b3a",
+    padding: 25,
     borderRadius: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
-    marginTop:0,
+    marginTop: 0,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 20,
-    color: "#333",
+    marginBottom: 25,
+    color: "#ffd166",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    paddingHorizontal: 10,
+    borderColor: "#555",
+    borderRadius: 12,
+    paddingHorizontal: 12,
     marginBottom: 20,
-    backgroundColor: "#F9F9F9",
+    backgroundColor: "#3b3b4f",
   },
   input: {
     flex: 1,
     marginLeft: 10,
-    color: "#333",
+    color: "#fff",
     fontSize: 16,
   },
   optionsRow: {
@@ -166,17 +166,17 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 14,
-    color: "#555",
+    color: "#aaa",
   },
   forgotPassword: {
     fontSize: 14,
-    color: "#6A11CB",
+    color: "#ff6b6b",
     fontWeight: "500",
   },
   loginButton: {
-    backgroundColor: "#6A11CB",
+    backgroundColor: "#4a90e2",
     paddingVertical: 15,
-    borderRadius: 10,
+    borderRadius: 12,
     marginBottom: 20,
   },
   loginButtonText: {
@@ -187,11 +187,11 @@ const styles = StyleSheet.create({
   },
   registerText: {
     textAlign: "center",
-    color: "#555",
+    color: "#ddd",
     fontSize: 14,
   },
   registerLink: {
-    color: "#6A11CB",
+    color: "#ff6b6b",
     fontWeight: "bold",
   },
 });

@@ -55,20 +55,18 @@ const HomeScreen = () => {
   };
 
   // Function to submit the report
-  const submitReport = async () => {
+  const submitReport = async (postId) => {
     if (!reportReason.trim()) {
       Alert.alert("Error", "Please provide a reason for reporting.");
       return;
     }
 
     try {
-      const response = await fetch("https://your-backend-api.com/report", {
+      const response = await fetch("http://10.0.2.2/report", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          postId: post._id,
+          postId,
           reportedBy: userId,
           reason: reportReason,
           reportedAt: new Date().toISOString(),
@@ -76,7 +74,6 @@ const HomeScreen = () => {
       });
 
       const data = await response.json();
-
       if (data.success) {
         Alert.alert("Success", "Report submitted successfully.");
         setModalVisible(false);
@@ -163,8 +160,10 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId]);
 
   // Fetch posts
   useFocusEffect(
@@ -334,13 +333,7 @@ const HomeScreen = () => {
               color="#fff"
               style={styles.icon}
             />
-            <Ionicons
-              onPress={() => navigation.navigate("GroupList")}
-              name="chatbox-ellipses-outline"
-              size={28}
-              color="#fff"
-              style={styles.icon}
-            />
+           
             <MaterialIcons
               onPress={handleLogout}
               name="logout"
@@ -575,14 +568,14 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#1e1e2e", // Soft Charcoal
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
-    backgroundColor: "#6A11CB",
+    backgroundColor: "#4a90e2", // Royal Blue
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     elevation: 4,
@@ -598,25 +591,32 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "transparent",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
     width: 300,
-
     padding: 20,
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     borderRadius: 10,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#ffd166", // Lemon Yellow
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
+    backgroundColor: "#fff",
   },
-  buttonContainer: { flexDirection: "row", justifyContent: "space-between" },
-
-  modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#4a90e2", // Royal Blue
+  },
   appName: {
     flex: 1,
     textAlign: "center",
@@ -649,7 +649,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderWidth: 1,
     borderColor: "#E0E0E0",
-    position: "relative",
   },
   postHeader: {
     flexDirection: "row",
@@ -666,7 +665,7 @@ const styles = StyleSheet.create({
   postUserName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
+    color: "#4a90e2", // Royal Blue
     fontFamily: "Poppins",
   },
   postContent: {
@@ -691,7 +690,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 20,
     right: 20,
-    backgroundColor: "#6A11CB",
+    backgroundColor: "#ff6b6b",
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -707,6 +706,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 20,
+    borderRadius: 20,
+    margin:5,
   },
   chatbotHeader: {
     flexDirection: "row",
@@ -717,7 +718,7 @@ const styles = StyleSheet.create({
   chatbotTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: "#4a90e2",
   },
   chatMessages: {
     flex: 1,
@@ -733,7 +734,7 @@ const styles = StyleSheet.create({
   },
   botMessage: {
     alignSelf: "flex-start",
-    backgroundColor: "#ECECEC",
+    backgroundColor: "#E3EAFD",
     borderRadius: 8,
     padding: 10,
     marginBottom: 5,

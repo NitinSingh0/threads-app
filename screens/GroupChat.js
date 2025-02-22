@@ -217,13 +217,13 @@ const GroupChat = ({ navigation }) => {
 export default GroupChat;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ECE5DD" },
+  container: { flex: 1, backgroundColor: "#F0F0F0" },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
-    backgroundColor: "#075E54",
+    backgroundColor: "#4a90e2",
     justifyContent: "space-between",
   },
   backButton: { color: "#FFF", fontSize: 18, marginRight: 10 },

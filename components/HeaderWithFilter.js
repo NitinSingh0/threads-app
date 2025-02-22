@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#000",
+    color: "#4a90e2",
   },
   filterButton: {
     flexDirection: "row",
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   activeFilter: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#4a90e2",
   },
   inactiveFilter: {
     backgroundColor: "#1E90FF",
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   filterContainer: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#4a90e2",
     paddingVertical: 10,
     borderRadius: 8,
     marginTop: 5,
