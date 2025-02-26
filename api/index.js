@@ -966,3 +966,35 @@ app.post("/report", async (req, res) => {
       .json({ message: "An error occurred while reporting the post." });
   }
 });
+
+app.post("/friend-request/decline", async (req, res) => {
+  try {
+    const { senderId, recepientId } = req.body;
+
+    // Retrieve the recipient user
+    const receipient = await User.findById(recepientId);
+    const sender = await User.findById(senderId);
+
+    if (!receipient || !sender) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Remove the sender from the recipient's friendRequest array
+    receipient.friendRequest = receipient.friendRequest.filter(
+      (request) => request.toString() !== senderId.toString()
+    );
+
+    // Remove the recipient from the sender's sentFriendRequest array
+    sender.sentFriendRequest = sender.sentFriendRequest.filter(
+      (request) => request.toString() !== recepientId.toString()
+    );
+
+    await receipient.save();
+    await sender.save();
+
+    res.status(200).json({ message: "Friend request declined successfully" });
+  } catch (error) {
+    console.log("Error", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});

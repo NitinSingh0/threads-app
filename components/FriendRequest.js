@@ -8,7 +8,6 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const navigation = useNavigation();
 
   const acceptRequest = async (friendRequestId) => {
-    console.log("Friend Request id : ", friendRequestId);
     try {
       const response = await fetch(
         "http://10.0.2.2:3000/friend-request/accept",
@@ -24,9 +23,9 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
         }
       );
       if (response.ok) {
-        // Filter out the accepted friend request
-        setFriendRequests(
-          friendRequests.filter((request) => request._id !== friendRequestId)
+        // Remove accepted request from UI
+        setFriendRequests((prevRequests) =>
+          prevRequests.filter((request) => request._id !== friendRequestId)
         );
         navigation.navigate("Chats");
       }
@@ -35,34 +34,85 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
     }
   };
 
+  const declineRequest = async (friendRequestId) => {
+    try {
+      const response = await fetch(
+        "http://10.0.2.2:3000/friend-request/decline",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            senderId: friendRequestId,
+            recepientId: userId,
+          }),
+        }
+      );
+      if (response.ok) {
+        // Remove declined request from UI
+        setFriendRequests((prevRequests) =>
+          prevRequests.filter((request) => request._id !== friendRequestId)
+        );
+      }
+    } catch (error) {
+      console.log("Error declining the friend request", error);
+    }
+  };
+
   return (
-    <Pressable
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        marginVertical: 10,
-      }}
-    >
-      <Image
-        style={{ width: 50, height: 50, borderRadius: 25 }}
-        source={{ uri: item.image }}
-      />
-      <Text
-        style={{ fontSize: 15, fontWeight: "bold", marginLeft: 10, flex: 1 }}
-      >
-        {item?.name} sent you a friend request
-      </Text>
+    <Pressable style={styles.container}>
+      <Image style={styles.image} source={{ uri: item.image }} />
+      <Text style={styles.text}>{item?.name} sent you a friend request</Text>
       <Pressable
         onPress={() => acceptRequest(item._id)}
-        style={{ backgroundColor: "#0066b2", padding: 10, borderRadius: 6 }}
+        style={styles.acceptButton}
       >
-        <Text style={{ textAlign: "center", color: "white" }}>Accept</Text>
+        <Text style={styles.buttonText}>Accept</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => declineRequest(item._id)}
+        style={styles.declineButton}
+      >
+        <Text style={[styles.buttonText, { color: "red" }]}>Decline</Text>
       </Pressable>
     </Pressable>
   );
 };
 
-export default FriendRequest;
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  image: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  text: {
+    fontSize: 15,
+    fontWeight: "bold",
+    marginLeft: 10,
+    flex: 1,
+  },
+  acceptButton: {
+    backgroundColor: "#0066b2",
+    padding: 10,
+    borderRadius: 6,
+  },
+  declineButton: {
+    backgroundColor: "#f8d7da",
+    padding: 10,
+    borderRadius: 6,
+    marginLeft:4,
+  },
+  buttonText: {
+    textAlign: "center",
+    color: "white",
+  },
+});
 
-const styles = StyleSheet.create({});
+export default FriendRequest;
