@@ -304,7 +304,7 @@ app.put("/post/:postId/:userId/unlike", async (req, res) => {
 app.get("/get-posts", async (req, res) => {
   try {
     const posts = await Post.find()
-      .populate("user", "name")
+      .populate("user", "name user_type course ")
       .populate("replies.user", "name picture")
       .sort({ createdAt: -1 });
     res.status(200).json(posts);

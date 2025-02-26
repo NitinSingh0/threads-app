@@ -5,7 +5,7 @@ import {
   MenuOption,
   MenuTrigger,
 } from "react-native-popup-menu";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   StyleSheet,
   Text,
@@ -373,6 +373,26 @@ const HomeScreen = () => {
                   <Text style={styles.postUserName}>
                     {post?.user?.name || "Anonymous"}
                   </Text>
+                  <View style={styles.userTypeContainer}>
+                    {post?.user?.user_type === "student" ? (
+                      <MaterialCommunityIcons
+                        name="school"
+                        size={18}
+                        color="blue"
+                      />
+                    ) : (
+                      <MaterialCommunityIcons
+                        name="account-tie"
+                        size={18}
+                        color="brown"
+                      />
+                    )}
+                  </View>
+
+                  {/* Course Name if Available */}
+                  {post?.user?.course && (
+                    <Text style={styles.courseText}>{post.user.course}</Text>
+                  )}
                   <Menu style={styles.menuIconContainer}>
                     <MenuTrigger>
                       <Ionicons
@@ -573,6 +593,23 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  courseText: {
+    fontSize: 14,
+    color: "#007AFF",
+    fontStyle: "italic",
+    marginTop: 2,
+    marginLeft: 4,
+  },
+  userTypeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 2,
+  },
+  userTypeText: {
+    marginLeft: 5,
+    fontSize: 14,
+    color: "#555",
+  },
   container: {
     flex: 1,
     backgroundColor: "#1e1e2e", // Soft Charcoal
