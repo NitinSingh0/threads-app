@@ -174,33 +174,7 @@ const ProfileScreen = () => {
                   <Text style={styles.postUserName}>{post.user.name}</Text>
                 </View>
                 <Text style={styles.postContent}>{post.content}</Text>
-                <View style={styles.postActions}>
-                  {post.likes.includes(userId) ? (
-                    <Animated.View
-                      style={{ transform: [{ scale: likeScale }] }}
-                    >
-                      <AntDesign
-                        onPress={() => handleUnlike(post._id)}
-                        name="heart"
-                        size={22}
-                        color="red"
-                      />
-                    </Animated.View>
-                  ) : (
-                    <AntDesign
-                      onPress={() => handleLike(post._id)}
-                      name="hearto"
-                      size={22}
-                      color="gray"
-                    />
-                  )}
-                  <FontAwesome name="comment-o" size={22} color="gray" />
-                  <Ionicons
-                    name="share-social-outline"
-                    size={22}
-                    color="gray"
-                  />
-                </View>
+               
                 <Text style={styles.postFooter}>
                   {post.likes.length} Kudos | {post.replies.length} Insights
                 </Text>
@@ -209,7 +183,7 @@ const ProfileScreen = () => {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>College Social Network</Text>
+            <Text style={styles.footerText}>Campus Connect</Text>
           </View>
         </View>
       </ScrollView>

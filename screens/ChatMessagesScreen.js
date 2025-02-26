@@ -69,9 +69,18 @@ const ChatMessagesScreen = () => {
       console.log("Error fetching messages ", error);
     }
   };
+  
+
   useEffect(() => {
-    fetchMessages();
+    fetchMessages(); // Initial fetch
+
+    const interval = setInterval(() => {
+      fetchMessages();
+    }, 1000); // Fetch messages every 3 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
+
 
   useEffect(() => {
     const fetchRecepientData = async () => {

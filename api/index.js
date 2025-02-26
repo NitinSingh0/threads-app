@@ -305,6 +305,7 @@ app.get("/get-posts", async (req, res) => {
   try {
     const posts = await Post.find()
       .populate("user", "name")
+      .populate("replies.user", "name picture")
       .sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (error) {
@@ -870,7 +871,10 @@ app.get("/groupList/:userId", async (req, res) => {
 app.get("/fetchFriendss/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await User.findById(userId).populate("friends", "_id name image");
+    const user = await User.findById(userId).populate(
+      "friends",
+      "_id name image"
+    );
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -885,7 +889,8 @@ app.get("/fetchFriendss/:userId", async (req, res) => {
 // 📌 1️⃣ Fetch Group Details
 app.get("/groups/:groupId", async (req, res) => {
   try {
-    const group = await Group.findById(req.params.groupId).populate("admin", "_id name profilePicture") // Populate admin details
+    const group = await Group.findById(req.params.groupId)
+      .populate("admin", "_id name profilePicture") // Populate admin details
       .populate("members", "_id name profilePicture");
     if (!group) return res.status(404).json({ error: "Group not found" });
     res.json(group);
@@ -897,7 +902,9 @@ app.get("/groups/:groupId", async (req, res) => {
 // 📌 2️⃣ Fetch Group Messages groups/${groupId}/messages
 app.get("/groups/:groupId/messages", async (req, res) => {
   try {
-    const messages = await Message.find({ groupId: req.params.groupId }).populate("senderId", "name profilePicture");
+    const messages = await Message.find({
+      groupId: req.params.groupId,
+    }).populate("senderId", "name profilePicture");
     res.json(messages);
   } catch (error) {
     res.status(500).json({ error: "Error fetching messages" });
@@ -926,5 +933,36 @@ app.post("/send-message", async (req, res) => {
     res.status(201).json(newMessage);
   } catch (error) {
     res.status(500).json({ error: "Error sending message" });
+  }
+});
+
+//endpoint to create a report
+app.post("/report", async (req, res) => {
+  try {
+    const { postId, reportedBy, reason, reportedAt } = req.body;
+
+    // Validate request
+    if (!postId || !reportedBy || !reason) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    // Check if the post exists
+    const postExists = await Post.findById(postId);
+    if (!postExists) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+
+    // Create and save report
+    const report = new Report({ postId, reportedBy, reason, reportedAt });
+    await report.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Report submitted successfully." });
+  } catch (error) {
+    console.error("Error reporting post:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while reporting the post." });
   }
 });

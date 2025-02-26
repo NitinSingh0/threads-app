@@ -1,5 +1,3 @@
-//AIzaSyCBMtfl0J6pE8HmMC0drHyv_nLTJlBa59Y
-
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   Menu,
@@ -45,6 +43,8 @@ const HomeScreen = () => {
   const [visibleComments, setVisibleComments] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [reportReason, setReportReason] = useState("");
+  const [selectedPostId, setSelectedPostId] = useState(null);
+  //const [modalVisible, setModalVisible] = useState(false);
 
   // Toggle comments visibility
   const toggleComments = (postId) => {
@@ -54,19 +54,23 @@ const HomeScreen = () => {
     }));
   };
 
+  const openReportModal = (postId) => {
+    setSelectedPostId(postId); // Store the selected post ID
+    setModalVisible(true);
+  };
   // Function to submit the report
   const submitReport = async (postId) => {
     if (!reportReason.trim()) {
       Alert.alert("Error", "Please provide a reason for reporting.");
       return;
     }
-
+    console.log("Reporting Post ID:", selectedPostId); // Debugging
     try {
-      const response = await fetch("http://10.0.2.2/report", {
+      const response = await fetch("http://10.0.2.2:3000/report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          postId,
+          postId: selectedPostId,
           reportedBy: userId,
           reason: reportReason,
           reportedAt: new Date().toISOString(),
@@ -76,10 +80,12 @@ const HomeScreen = () => {
       const data = await response.json();
       if (data.success) {
         Alert.alert("Success", "Report submitted successfully.");
-        setModalVisible(false);
         setReportReason("");
+        setModalVisible(false);
       } else {
         Alert.alert("Error", data.message || "Something went wrong.");
+        setReportReason("");
+        setModalVisible(false);
       }
     } catch (error) {
       console.error("Error submitting report:", error);
@@ -143,7 +149,7 @@ const HomeScreen = () => {
     };
 
     fetchUserId();
-    fetchProfile();
+    //fetchProfile();
   }, []);
 
   const fetchProfile = async () => {
@@ -176,6 +182,7 @@ const HomeScreen = () => {
     try {
       const response = await axios.get("http://10.0.2.2:3000/get-posts");
       setPosts(response.data);
+      console.log("Post : ", response.data);
     } catch (error) {
       console.error("Error fetching posts", error);
     }
@@ -333,7 +340,7 @@ const HomeScreen = () => {
               color="#fff"
               style={styles.icon}
             />
-           
+
             <MaterialIcons
               onPress={handleLogout}
               name="logout"
@@ -376,7 +383,7 @@ const HomeScreen = () => {
                     </MenuTrigger>
                     <MenuOptions>
                       <MenuOption
-                        onSelect={() => setModalVisible(true)}
+                        onSelect={() => openReportModal(post._id)}
                         text="Report"
                       />
                     </MenuOptions>
@@ -707,7 +714,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 20,
-    margin:5,
+    margin: 5,
   },
   chatbotHeader: {
     flexDirection: "row",
