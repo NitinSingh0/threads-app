@@ -107,7 +107,7 @@ const ActivityScreen = () => {
         <Text style={styles.title}>Engagements</Text>
 
         <View style={styles.buttonGroup}>
-          {["people", "all", "requests"].map((buttonName) => (
+          {[ "all", "requests"].map((buttonName) => (
             <TouchableOpacity
               key={buttonName}
               onPress={() => handleButtonClick(buttonName)}
