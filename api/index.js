@@ -9,8 +9,18 @@ const bcrypt = require("bcrypt");
 const app = express();
 const port = 3000;
 const cors = require("cors");
-app.use(cors());
+const corsOptions = {
+  origin: "*", // Allows requests from ANY origin
+  methods: "*", // Allows ALL HTTP methods (GET, POST, PUT, DELETE, etc.)
+  allowedHeaders: "*", // Allows ALL headers
+  credentials: true, // Allows cookies/auth headers
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
+app.get("/", (req, res) => {
+  res.send("CORS fixed!");
+});
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 const jwt = require("jsonwebtoken");
