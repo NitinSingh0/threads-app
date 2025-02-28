@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const bcrypt = require("bcrypt");
 const app = express();
 const port = 3000;
 const cors = require("cors");
@@ -114,14 +115,20 @@ const secretKey = generateSecretKey();
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const user = await User.findOne({ email });
-    if (user.account_status == "suspended") {
-      return res.status(404).json({ message: "Your account is suspended!" });
+    if (user.account_status != "active") {
+      return res
+        .status(404)
+        .json({ message: "Account is not active. Please contact support." });
     }
     if (!user) {
       return res.status(404).json({ message: "Invallid email or password" });
     }
-    if (user.password != password) {
+    if (!user.comparePassword(password)) {
       return res.status(404).json({ message: "Invalid email or password" });
     }
     const token = jwt.sign({ userId: user._id }, secretKey);
