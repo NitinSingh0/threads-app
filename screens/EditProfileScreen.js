@@ -28,14 +28,17 @@ const EditProfileScreen = ({ route }) => {
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://10.0.2.2:3000/profile/${userId}`, {
-        name,
-        profilePicture,
-        backgroundPicture,
-        course,
-        bio,
-        passingYear,
-      });
+      await axios.put(
+        `https://campusconnect-phi.vercel.app/profile/${userId}`,
+        {
+          name,
+          profilePicture,
+          backgroundPicture,
+          course,
+          bio,
+          passingYear,
+        }
+      );
 
       alert("Profile updated successfully!");
       navigation.goBack();

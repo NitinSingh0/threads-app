@@ -70,7 +70,7 @@ const HomeScreen = () => {
       setUserId(userId);
       console.log("User Id : ", userId);
       axios
-        .get(`http://10.0.2.2:3000/user/${userId}`)
+        .get(`https://campusconnect-phi.vercel.app/user/${userId}`)
         .then((response) => {
           setUsers(response.data);
         })

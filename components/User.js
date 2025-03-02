@@ -9,13 +9,16 @@ const User = ({ item }) => {
   const [requestSent, setRequestSent] = useState(false);
   const sendFollow = async (currentUserId, selectedUserId) => {
     try {
-      const response = await fetch("http://10.0.2.2:3000/follow", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ currentUserId, selectedUserId }),
-      });
+      const response = await fetch(
+        "https://campusconnect-phi.vercel.app/follow",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ currentUserId, selectedUserId }),
+        }
+      );
       if (response.ok) {
         setRequestSent(true);
       }
@@ -26,17 +29,20 @@ const User = ({ item }) => {
 
   const handleUnfollow = async (targetId) => {
     try {
-      const response = await fetch("http://10.0.2.2:3000/users/unfollow", {
-        // Removed extra '/'
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          loggedInUserId: userId, // Correct property name
-          targetUserId: targetId,
-        }),
-      });
+      const response = await fetch(
+        "https://campusconnect-phi.vercel.app/users/unfollow",
+        {
+          // Removed extra '/'
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            loggedInUserId: userId, // Correct property name
+            targetUserId: targetId,
+          }),
+        }
+      );
       if (response.ok) {
         setRequestSent(false);
         console.log("Unfollowed successfully");

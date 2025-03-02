@@ -13,7 +13,7 @@ const ChatsScreen = () => {
     const acceptedFriendsList = async () => {
       try {
         const response = await fetch(
-          `http://10.0.2.2:3000/accepted-friends/${userId}`
+          `https://campusconnect-phi.vercel.app/accepted-friends/${userId}`
         );
         const data = await response.json();
         if (response.ok) {

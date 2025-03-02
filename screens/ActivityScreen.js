@@ -37,7 +37,9 @@ const ActivityScreen = () => {
         const userId = decodeToken.userId;
         setUserId(userId);
 
-        const response = await axios.get(`http://10.0.2.2:3000/user/${userId}`);
+        const response = await axios.get(
+          `https://campusconnect-phi.vercel.app/user/${userId}`
+        );
         setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -49,32 +51,30 @@ const ActivityScreen = () => {
 
   //fetch only friends list
   const [friendsList, setFriendsList] = useState([]);
-   useEffect(() => {
-     const fetchFriends = async () => {
-       try {
-         const token = await AsyncStorage.getItem("authToken");
-         if (!token) {
-           console.error("Auth token not found");
-           return;
-         }
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (!token) {
+          console.error("Auth token not found");
+          return;
+        }
 
-         const decodeToken = jwtDecode(token);
-         const userId = decodeToken.userId;
-         setUserId(userId);
+        const decodeToken = jwtDecode(token);
+        const userId = decodeToken.userId;
+        setUserId(userId);
 
-         const response = await axios.get(
-           `http://10.0.2.2:3000/user/friendslist/${userId}`
-         );
-         setFriendsList(response.data);
-       } catch (error) {
-         console.error("Error fetching users:", error);
-       }
-     };
+        const response = await axios.get(
+          `https://campusconnect-phi.vercel.app/user/friendslist/${userId}`
+        );
+        setFriendsList(response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
 
-     fetchFriends();
-   }, [setUserId]);
-
-
+    fetchFriends();
+  }, [setUserId]);
 
   const [friendRequests, setFriendRequests] = useState([]);
   useEffect(() => {
@@ -84,7 +84,7 @@ const ActivityScreen = () => {
     console.log("User Id : ", userId);
     try {
       const response = await axios.get(
-        `http://10.0.2.2:3000/friend-request/${userId}`
+        `https://campusconnect-phi.vercel.app/friend-request/${userId}`
       );
       if (response.status === 200) {
         const friendRequestData = response.data.map((friendRequest) => ({

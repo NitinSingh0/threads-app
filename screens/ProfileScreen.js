@@ -37,14 +37,14 @@ const ProfileScreen = () => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(
-          `http://10.0.2.2:3000/profile/${userId}`
+          `https://campusconnect-phi.vercel.app/profile/${userId}`
         );
         const { user } = response.data;
         setUser(user);
 
         // Fetch the user's posts
         const postsResponse = await axios.get(
-          `http://10.0.2.2:3000/posts/user/${userId}`
+          `https://campusconnect-phi.vercel.app/posts/user/${userId}`
         );
         setPosts(postsResponse.data.posts);
         console.log("Post ::", posts);

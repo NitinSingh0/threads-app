@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import { UserType } from "../UserContext";
 
-const API_URL = "http://10.0.2.2:3000";
+const API_URL = "https://campusconnect-phi.vercel.app";
 
 const GroupList = ({ navigation }) => {
   const { userId } = useContext(UserType);

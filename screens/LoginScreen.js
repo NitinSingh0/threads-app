@@ -48,7 +48,7 @@ const LoginScreen = () => {
   const handleLogin = () => {
     const user = { email, password };
     axios
-      .post("http:/10.0.2.2:3000/login", user)
+      .post("https://campusconnect-phi.vercel.app/login", user)
       .then((response) => {
         const token = response.data.token;
         AsyncStorage.setItem("authToken", token);

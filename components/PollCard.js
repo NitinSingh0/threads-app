@@ -24,7 +24,7 @@ const PollCard = ({
   isPollClosed,
   createdAt,
 }) => {
-  const BASE_URL = "http://10.0.2.2:3000";
+  const BASE_URL = "https://campusconnect-phi.vercel.app";
   const { userId } = useContext(UserType);
   const { user, onUserVoted, toggleBookmarkId } = useContext(UserContext);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(-1);

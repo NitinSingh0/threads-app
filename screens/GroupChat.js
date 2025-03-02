@@ -14,7 +14,7 @@ import Video from "react-native-video";
 import axios from "axios";
 import { UserType } from "../UserContext";
 
-const API_URL = "http://10.0.2.2:3000";
+const API_URL = "https://campusconnect-phi.vercel.app";
 
 const GroupChat = ({ navigation }) => {
   const route = useRoute();

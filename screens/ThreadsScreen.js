@@ -25,7 +25,7 @@ useEffect(() => {
   const fetchProfile = async () => {
     try {
       const response = await axios.get(
-        `http://10.0.2.2:3000/profile/${userId}`
+        `https://campusconnect-phi.vercel.app/profile/${userId}`
       );
       const { user } = response.data;
       setUser(user);
@@ -35,44 +35,44 @@ useEffect(() => {
   };
   fetchProfile();
 }, [userId]);
-  const fetchUsers = async () => {
-    try {
-      const token = await AsyncStorage.getItem("authToken");
-      if (!token) {
-        console.error("Auth token not found");
-        return;
-      }
-
-      const decodedToken = jwtDecode(token);
-      const userId = decodedToken.userId;
-      setUserId(userId);
-    } catch (error) {
-      console.error("Error fetching userId:", error);
+const fetchUsers = async () => {
+  try {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) {
+      console.error("Auth token not found");
+      return;
     }
-  };
 
-  fetchUsers();
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken.userId;
+    setUserId(userId);
+  } catch (error) {
+    console.error("Error fetching userId:", error);
+  }
+};
 
-  const handlePostSubmit = () => {
-    const postData = {
-      userId: userId,
-    };
-    if (content) {
-      postData.content = content;
-    }
-    axios
-      .post("http://10.0.2.2:3000/create-post", postData)
-      .then((response) => {
-        console.log(response.data.message);
-        setContent("");
-      })
-      .catch((error) => {
-        console.log(
-          "Error creating post:",
-          error.response?.data || error.message
-        );
-      });
+fetchUsers();
+
+const handlePostSubmit = () => {
+  const postData = {
+    userId: userId,
   };
+  if (content) {
+    postData.content = content;
+  }
+  axios
+    .post("https://campusconnect-phi.vercel.app/create-post", postData)
+    .then((response) => {
+      console.log(response.data.message);
+      setContent("");
+    })
+    .catch((error) => {
+      console.log(
+        "Error creating post:",
+        error.response?.data || error.message
+      );
+    });
+};
 
   return (
     <SafeAreaView style={styles.container}>

@@ -15,7 +15,7 @@ import HeaderWithFilter from "../components/HeaderWithFilter";
 import { UserType } from "../UserContext";
 
 const PAGE_SIZE = 3;
-const BASE_URL = "http://10.0.2.2:3000";
+const BASE_URL = "https://campusconnect-phi.vercel.app";
 
 const PollScreen = () => {
   const navigation = useNavigation();

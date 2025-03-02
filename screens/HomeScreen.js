@@ -66,16 +66,19 @@ const HomeScreen = () => {
     }
     console.log("Reporting Post ID:", selectedPostId); // Debugging
     try {
-      const response = await fetch("http://10.0.2.2:3000/report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          postId: selectedPostId,
-          reportedBy: userId,
-          reason: reportReason,
-          reportedAt: new Date().toISOString(),
-        }),
-      });
+      const response = await fetch(
+        "https://campusconnect-phi.vercel.app/report",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            postId: selectedPostId,
+            reportedBy: userId,
+            reason: reportReason,
+            reportedAt: new Date().toISOString(),
+          }),
+        }
+      );
 
       const data = await response.json();
       if (data.success) {
@@ -155,7 +158,7 @@ const HomeScreen = () => {
   const fetchProfile = async () => {
     try {
       const response = await axios.get(
-        `http://10.0.2.2:3000/profile/${userId}`
+        `https://campusconnect-phi.vercel.app/profile/${userId}`
       );
       const { user } = response.data;
       setUser(user);
@@ -180,7 +183,9 @@ const HomeScreen = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await axios.get("http://10.0.2.2:3000/get-posts");
+      const response = await axios.get(
+        "https://campusconnect-phi.vercel.app/get-posts"
+      );
       setPosts(response.data);
       console.log("Post : ", response.data);
     } catch (error) {
@@ -207,7 +212,7 @@ const HomeScreen = () => {
     animateLike();
     try {
       const response = await axios.put(
-        `http://10.0.2.2:3000/post/${postId}/${userId}/like`
+        `https://campusconnect-phi.vercel.app/post/${postId}/${userId}/like`
       );
       const updatedPost = response.data;
       setPosts((prevPosts) =>
@@ -224,7 +229,7 @@ const HomeScreen = () => {
     if (!userId) return;
     try {
       const response = await axios.put(
-        `http://10.0.2.2:3000/post/${postId}/${userId}/unlike`
+        `https://campusconnect-phi.vercel.app/post/${postId}/${userId}/unlike`
       );
       const updatedPost = response.data;
       setPosts((prevPosts) =>
@@ -243,7 +248,7 @@ const HomeScreen = () => {
 
     try {
       const response = await axios.post(
-        `http://10.0.2.2:3000/post/${postId}/comment`,
+        `https://campusconnect-phi.vercel.app/post/${postId}/comment`,
         { comment: newComment, userId }
       );
       const updatedPost = response.data;

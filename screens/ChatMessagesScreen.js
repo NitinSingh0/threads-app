@@ -57,7 +57,7 @@ const ChatMessagesScreen = () => {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        `http://10.0.2.2:3000/messages/${userId}/${recepientId}`
+        `https://campusconnect-phi.vercel.app/messages/${userId}/${recepientId}`
       );
       const data = await response.json();
       if (response.ok) {
@@ -69,7 +69,6 @@ const ChatMessagesScreen = () => {
       console.log("Error fetching messages ", error);
     }
   };
-  
 
   useEffect(() => {
     fetchMessages(); // Initial fetch
@@ -81,12 +80,11 @@ const ChatMessagesScreen = () => {
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
-
   useEffect(() => {
     const fetchRecepientData = async () => {
       try {
         const response = await fetch(
-          `http://10.0.2.2:3000/user/recepient/${recepientId}`
+          `https://campusconnect-phi.vercel.app/user/recepient/${recepientId}`
         );
         const data = await response.json();
         setRecepientData(data);
@@ -117,10 +115,13 @@ const ChatMessagesScreen = () => {
         formData.append("messageText", message);
       }
 
-      const response = await fetch("http://10.0.2.2:3000/messages", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://campusconnect-phi.vercel.app/messages",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       if (response.ok) {
         setMessage("");
@@ -193,13 +194,16 @@ const ChatMessagesScreen = () => {
   }, [recepientData, selectedMessages]);
   const deleteMessages = async (messageIds) => {
     try {
-      const response = await fetch("http://10.0.2.2:3000/deleteMessages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ messages: messageIds }),
-      });
+      const response = await fetch(
+        "https://campusconnect-phi.vercel.app/deleteMessages",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ messages: messageIds }),
+        }
+      );
       if (response.ok) {
         setSelectedMessages((previousMessages) =>
           previousMessages.filter((id) => !messageIds.includes(id))

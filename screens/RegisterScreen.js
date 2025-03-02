@@ -25,7 +25,7 @@ const RegisterScreen = () => {
   const handleRegister = () => {
     const user = { name, email, password };
     axios
-      .post("http://10.0.2.2:3000/register", user)
+      .post("https://campusconnect-phi.vercel.app/register", user)
       .then(() => {
         Alert.alert("Success", "You have been registered successfully");
         setName("");

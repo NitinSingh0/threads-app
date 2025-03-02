@@ -12,7 +12,7 @@ const User = ({ item }) => {
       console.log("UserID : ", userId);
       try {
         const response = await fetch(
-          `http://10.0.2.2:3000/friend-requests/sent/${userId}`
+          `https://campusconnect-phi.vercel.app/friend-requests/sent/${userId}`
         );
         const data = await response.json();
         if (response.ok) {
@@ -31,7 +31,9 @@ const User = ({ item }) => {
     const fetchUserFriends = async () => {
       try {
         console.log("User id in friends page : ", userId);
-        const response = await fetch(`http://10.0.2.2:3000/friends/${userId}`);
+        const response = await fetch(
+          `https://campusconnect-phi.vercel.app/friends/${userId}`
+        );
         const data = await response.json();
         if (response.ok) {
           setUserFriends(data);
@@ -47,13 +49,16 @@ const User = ({ item }) => {
   }, []);
   const sendFriendRequest = async (currentUserId, selectedUserId) => {
     try {
-      const response = await fetch("http://10.0.2.2:3000/friend-request", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ currentUserId, selectedUserId }),
-      });
+      const response = await fetch(
+        "https://campusconnect-phi.vercel.app/friend-request",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ currentUserId, selectedUserId }),
+        }
+      );
       if (response.ok) {
         setRequestSent(true);
       }

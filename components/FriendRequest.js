@@ -10,7 +10,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const acceptRequest = async (friendRequestId) => {
     try {
       const response = await fetch(
-        "http://10.0.2.2:3000/friend-request/accept",
+        "https://campusconnect-phi.vercel.app/friend-request/accept",
         {
           method: "POST",
           headers: {
@@ -37,7 +37,7 @@ const FriendRequest = ({ item, friendRequests, setFriendRequests }) => {
   const declineRequest = async (friendRequestId) => {
     try {
       const response = await fetch(
-        "http://10.0.2.2:3000/friend-request/decline",
+        "https://campusconnect-phi.vercel.app/friend-request/decline",
         {
           method: "POST",
           headers: {
