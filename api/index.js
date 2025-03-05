@@ -1035,22 +1035,29 @@ app.post("/friend-request/decline", async (req, res) => {
 app.post("/reset-password", async (req, res) => {
   const { userId, oldPassword, newPassword } = req.body;
 
+  console.log("Incoming Request Body:", req.body); // Debugging: Log the request body
+
   try {
     // Find the user by ID
     const user = await User.findById(userId);
-
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      console.log("User not found"); // Debugging: Log if user is not found
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Verify the old password
     const isMatch = await user.comparePassword(oldPassword);
     if (!isMatch) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Old password is incorrect" });
+      console.log("Old password is incorrect"); // Debugging: Log if old password is incorrect
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    // Check if the new password is the same as the old password
+    if (oldPassword === newPassword) {
+      console.log("New password cannot be the same as the old password"); // Debugging: Log if new password is the same as the old password
+      return res.status(400).json({
+        message: "New password cannot be the same as the old password",
+      });
     }
 
     // Hash the new password
@@ -1061,13 +1068,10 @@ app.post("/reset-password", async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "Password reset successfully" });
+    console.log("Password reset successfully"); // Debugging: Log success
+    res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
-    if (error.response && error.response.data && error.response.data.message) {
-    setError(error.response.data.message); // Display the backend error message
-  } else {
-    setError("Failed to reset password. Please try again.");
+    console.error("Error resetting password:", error); // Debugging: Log the error
+    res.status(500).json({ message: "Failed to reset password" });
   }
 });
