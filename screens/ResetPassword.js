@@ -8,21 +8,26 @@ import {
   KeyboardAvoidingView,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native"; // Add useRoute
 import { useCallback } from "react";
+import axios from "axios";
 
 const ResetPassword = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // Use useRoute to access route params
+  const { userId } = route.params; // Extract userId from route params
+
+  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = useCallback(() => {
-    if (!newPassword || !confirmPassword) {
-      setError("Both fields are required");
+  const handleSubmit = useCallback(async () => {
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setError("All fields are required");
       return;
     }
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       setError("Password must be at least 6 characters long");
       return;
     }
@@ -31,10 +36,29 @@ const ResetPassword = () => {
       return;
     }
 
-    Alert.alert("Success", "Password has been reset!", [
-      { text: "OK", onPress: () => navigation.navigate("Main") },
-    ]);
-  }, [newPassword, confirmPassword]);
+    try {
+      // Call the reset password API
+      const response = await axios.post(
+        "https://your-api-endpoint.com/reset-password",
+        {
+          userId, // Pass the userId to the API
+          oldPassword,
+          newPassword,
+        }
+      );
+
+      if (response.data.success) {
+        Alert.alert("Success", "Password has been reset!", [
+          { text: "OK", onPress: () => navigation.navigate("Main") },
+        ]);
+      } else {
+        setError(response.data.message || "Failed to reset password");
+      }
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      setError("An error occurred. Please try again.");
+    }
+  }, [userId, oldPassword, newPassword, confirmPassword]);
 
   return (
     <KeyboardAvoidingView behavior="height" style={styles.container}>
@@ -47,6 +71,15 @@ const ResetPassword = () => {
 
         <View style={styles.formContainer}>
           <Text style={styles.title}>Reset Password</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Old Password"
+            placeholderTextColor="#ddd"
+            secureTextEntry={true}
+            value={oldPassword}
+            onChangeText={setOldPassword}
+          />
 
           <TextInput
             style={styles.input}

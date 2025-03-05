@@ -5,7 +5,7 @@ import {
   Animated,
   Image,
   Pressable,
-  FlatList, // Changed from ScrollView to FlatList
+  FlatList,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
@@ -124,21 +124,12 @@ const ProfileScreen = () => {
               <Text style={styles.statLabel}>Followers</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{user?.followingCount || "10"}</Text>
+              <Text style={styles.statNumber}>
+                {user?.followingCount || "10"}
+              </Text>
               <Text style={styles.statLabel}>Following</Text>
             </View>
           </View>
-
-          {/* <FlatList
-            data={posts}
-            renderItem={({ item }) => (
-              <View style={styles.postItem}>
-                <Text>{item.content}</Text>{" "}
-                
-              </View>
-            )}
-            keyExtractor={(item) => item._id.toString()} 
-          /> */}
 
           <View style={styles.buttonsSection}>
             <Pressable
@@ -148,6 +139,14 @@ const ProfileScreen = () => {
               style={styles.editProfileButton}
             >
               <Text>Edit Profile</Text>
+            </Pressable>
+            <Pressable
+              onPress={() =>
+                navigation.navigate("ResetPassword", { userId: userId })
+              }
+              style={styles.resetPasswordButton}
+            >
+              <Text>Reset Password</Text>
             </Pressable>
             <Pressable onPress={logout} style={styles.logoutButton}>
               <Text>Logout</Text>
@@ -174,7 +173,7 @@ const ProfileScreen = () => {
                   <Text style={styles.postUserName}>{post.user.name}</Text>
                 </View>
                 <Text style={styles.postContent}>{post.content}</Text>
-               
+
                 <Text style={styles.postFooter}>
                   {post.likes.length} Kudos | {post.replies.length} Insights
                 </Text>
@@ -286,6 +285,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     marginTop: 20,
     marginBottom: 30,
+    flexWrap: "wrap",
+    gap: 10,
   },
   editProfileButton: {
     padding: 12,
@@ -294,6 +295,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: "40%",
     alignItems: "center",
+    backgroundColor: "#FFF",
+  },
+  resetPasswordButton: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#D0D0D0",
+    borderRadius: 8,
+    width: "40%",
+    alignItems: "center",
+    backgroundColor: "#6A11CB",
   },
   logoutButton: {
     padding: 12,
@@ -302,6 +313,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: "40%",
     alignItems: "center",
+    backgroundColor: "#FF3B30",
   },
   footer: {
     marginTop: 40,
@@ -319,41 +331,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#D0D0D0",
     borderRadius: 8,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
-    backgroundColor: "#6A11CB",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: "#fff",
-  },
-  appName: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-    letterSpacing: 1,
-  },
-  headerIcons: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  icon: {
-    marginLeft: 16,
   },
   postsContainer: {
     padding: 16,
@@ -387,12 +364,6 @@ const styles = StyleSheet.create({
   postContent: {
     fontSize: 14,
     color: "#333",
-    marginVertical: 10,
-  },
-  postActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
     marginVertical: 10,
   },
   postFooter: {

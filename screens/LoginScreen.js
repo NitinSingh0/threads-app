@@ -65,42 +65,34 @@ const LoginScreen = () => {
         <Image style={styles.logo} source={require("../assets/icon.png")} />
       </Animated.View>
       <KeyboardAvoidingView style={styles.formContainer}>
-        <Text style={styles.title}>Sign In to Your Account</Text>
+        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.subtitle}>Sign in to continue</Text>
         <View style={styles.inputContainer}>
-          <MaterialIcons name="email" size={24} color="#4a90e2" />
+          <MaterialIcons name="email" size={24} color="#5A67D8" />
           <TextInput
             value={email}
             onChangeText={setEmail}
             placeholder="Enter your email"
-            placeholderTextColor="#ddd"
+            placeholderTextColor="#666"
             style={styles.input}
           />
         </View>
         <View style={styles.inputContainer}>
-          <AntDesign name="lock" size={24} color="#4a90e2" />
+          <AntDesign name="lock" size={24} color="#5A67D8" />
           <TextInput
             secureTextEntry
             value={password}
             onChangeText={setPassword}
             placeholder="Enter your password"
-            placeholderTextColor="#ddd"
+            placeholderTextColor="#666"
             style={styles.input}
           />
-        </View>
-        <View style={styles.optionsRow}>
-          <Text style={styles.optionText}>Keep me logged in</Text>
-          <Pressable onPress={() => navigation.navigate("ForgotPassword")}>
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
-          </Pressable>
         </View>
         <Pressable style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
         </Pressable>
-        <Pressable onPress={() => navigation.navigate("Register")}>
-          <Text style={styles.registerText}>
-            Don't have an account?{" "}
-            <Text style={styles.registerLink}>Sign Up</Text>
-          </Text>
+        <Pressable onPress={() => navigation.navigate("ForgotPassword")}>
+          <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </Pressable>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -112,86 +104,74 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1e1e2e",
+    backgroundColor: "#F7FAFC",
     alignItems: "center",
     justifyContent: "center",
   },
   logoContainer: {
-    marginBottom: 10,
+    marginBottom: 20,
   },
   logo: {
-    width: 220,
+    width: 180,
     height: 180,
     resizeMode: "contain",
   },
   formContainer: {
     width: "90%",
-    backgroundColor: "#2b2b3a",
+    backgroundColor: "#FFFFFF",
     padding: 25,
-    borderRadius: 15,
+    borderRadius: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 5,
-    marginTop: 0,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+    alignItems: "center",
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 25,
-    color: "#ffd166",
+    color: "#2D3748",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#718096",
+    marginBottom: 20,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#555",
-    borderRadius: 12,
+    borderColor: "#CBD5E0",
+    borderRadius: 10,
     paddingHorizontal: 12,
-    marginBottom: 20,
-    backgroundColor: "#3b3b4f",
+    marginBottom: 15,
+    backgroundColor: "#EDF2F7",
+    width: "100%",
+    height: 50,
   },
   input: {
     flex: 1,
     marginLeft: 10,
-    color: "#fff",
+    color: "#2D3748",
     fontSize: 16,
   },
-  optionsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
+  loginButton: {
+    backgroundColor: "#5A67D8",
+    paddingVertical: 14,
+    borderRadius: 10,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 15,
   },
-  optionText: {
-    fontSize: 14,
-    color: "#aaa",
+  loginButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   forgotPassword: {
     fontSize: 14,
-    color: "#ff6b6b",
+    color: "#5A67D8",
     fontWeight: "500",
-  },
-  loginButton: {
-    backgroundColor: "#4a90e2",
-    paddingVertical: 15,
-    borderRadius: 12,
-    marginBottom: 20,
-  },
-  loginButtonText: {
-    textAlign: "center",
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  registerText: {
-    textAlign: "center",
-    color: "#ddd",
-    fontSize: 14,
-  },
-  registerLink: {
-    color: "#ff6b6b",
-    fontWeight: "bold",
   },
 });

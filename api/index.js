@@ -1015,3 +1015,41 @@ app.post("/friend-request/decline", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+app.post("/reset-password", async (req, res) => {
+  const { userId, oldPassword, newPassword } = req.body;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Verify the old password
+    const isMatch = await user.comparePassword(oldPassword);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Old password is incorrect" });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update the user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
