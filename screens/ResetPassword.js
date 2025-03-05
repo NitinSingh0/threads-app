@@ -27,8 +27,12 @@ const ResetPassword = () => {
       setError("All fields are required");
       return;
     }
-    if (newPassword.length < 8) {
+    if (newPassword.length < 6) {
       setError("Password must be at least 6 characters long");
+      return;
+    }
+    if (newPassword === "newuser") {
+      setError("New password cannot be the default password");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -37,14 +41,17 @@ const ResetPassword = () => {
     }
 
     try {
-      // Call the reset password API
+      const payload = {
+        userId,
+        oldPassword,
+        newPassword,
+      };
+
+      console.log("Request Payload:", payload); // Debugging: Log the payload
+
       const response = await axios.post(
-        "https://your-api-endpoint.com/reset-password",
-        {
-          userId, // Pass the userId to the API
-          oldPassword,
-          newPassword,
-        }
+        "https://campusconnect-phi.vercel.app/reset-password",
+        payload
       );
 
       if (response.data.success) {

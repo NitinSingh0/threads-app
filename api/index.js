@@ -130,17 +130,33 @@ app.post("/login", async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    if (user.account_status != "active") {
+    if (!user) {
+      return res.status(404).json({ message: "Invalid email or password" });
+    }
+
+    if (user.account_status !== "active") {
       return res
         .status(404)
         .json({ message: "Account is not active. Please contact support." });
     }
-    if (!user) {
-      return res.status(404).json({ message: "Invallid email or password" });
-    }
-    if (!user.comparePassword(password)) {
+
+    // Check if the password is correct
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
       return res.status(404).json({ message: "Invalid email or password" });
     }
+
+    // Check if the password is the default password
+    if (password === "newuser") {
+      return res.status(200).json({
+        message: "Please change your password",
+        token: null, // No token is issued
+        userId: user._id, // Send the user ID for the reset password screen
+        forcePasswordChange: true, // Flag to indicate forced password change
+      });
+    }
+
+    // If everything is fine, generate a token
     const token = jwt.sign({ userId: user._id }, secretKey);
     res.status(200).json({ token, message: "Login successful" });
   } catch (error) {
@@ -1049,7 +1065,9 @@ app.post("/reset-password", async (req, res) => {
       .status(200)
       .json({ success: true, message: "Password reset successfully" });
   } catch (error) {
-    console.error("Error resetting password:", error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    if (error.response && error.response.data && error.response.data.message) {
+    setError(error.response.data.message); // Display the backend error message
+  } else {
+    setError("Failed to reset password. Please try again.");
   }
 });

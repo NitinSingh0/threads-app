@@ -50,12 +50,24 @@ const LoginScreen = () => {
     axios
       .post("https://campusconnect-phi.vercel.app/login", user)
       .then((response) => {
-        const token = response.data.token;
-        AsyncStorage.setItem("authToken", token);
-        navigation.navigate("Main");
+        if (response.data.forcePasswordChange) {
+          // Navigate to the Reset Password screen
+          navigation.navigate("ResetPassword", {
+            userId: response.data.userId,
+          });
+        } else {
+          // Save the token and navigate to the Main screen
+          const token = response.data.token;
+          AsyncStorage.setItem("authToken", token);
+          navigation.navigate("Main");
+        }
       })
-      .catch(() => {
-        Alert.alert("Login error", "Invalid email or password.");
+      .catch((error) => {
+        if (error.response && error.response.data.message) {
+          Alert.alert("Login error", error.response.data.message);
+        } else {
+          Alert.alert("Login error", "Invalid email or password.");
+        }
       });
   };
 
