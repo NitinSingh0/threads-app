@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "threads-app",
-    "slug": "threads-app",
+    "name": "CampusConnect",
+    "slug": "campus-connect",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
