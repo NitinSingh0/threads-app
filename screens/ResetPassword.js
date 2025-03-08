@@ -22,50 +22,47 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = useCallback(async () => {
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      setError("All fields are required");
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
-    }
-    if (newPassword === "newuser") {
-      setError("New password cannot be the default password");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+ const handleSubmit = async () => {
+   if (!oldPassword || !newPassword || !confirmPassword) {
+     setError("All fields are required");
+     return;
+   }
+   if (newPassword.length < 6) {
+     setError("Password must be at least 6 characters long");
+     return;
+   }
+   if (newPassword === "newuser") {
+     setError("New password cannot be the default password");
+     return;
+   }
+   if (newPassword !== confirmPassword) {
+     setError("Passwords do not match");
+     return;
+   }
 
-    try {
-      const payload = {
-        userId,
-        oldPassword,
-        newPassword,
-      };
+   try {
+     const response = await axios.post(
+       "https://campusconnect-phi.vercel.app/reset-password",
+       {
+         userId,
+         oldPassword,
+         newPassword,
+       }
+     );
 
-      console.log("Request Payload:", payload); // Debugging: Log the payload
-
-      const response = await axios.post(
-        "https://campusconnect-phi.vercel.app/reset-password",
-        payload
-      );
-
-      if (response.data.success) {
-        Alert.alert("Success", "Password has been reset!", [
-          { text: "OK", onPress: () => navigation.navigate("Main") },
-        ]);
-      } else {
-        setError(response.data.message || "Failed to reset password");
-      }
-    } catch (error) {
-      console.error("Error resetting password:", error);
-      setError("An error occurred. Please try again.");
-    }
-  }, [userId, oldPassword, newPassword, confirmPassword]);
+     if (response.data.message === "Password reset successfully") {
+       Alert.alert("Success", "Password reset successfully", [
+         { text: "OK", onPress: () => navigation.navigate("Login") },
+       ]);
+     }
+   } catch (error) {
+     if (error.response && error.response.data.message) {
+       setError(error.response.data.message); // Display the backend error message
+     } else {
+       setError("Failed to reset password. Please try again.");
+     }
+   }
+ };
 
   return (
     <KeyboardAvoidingView behavior="height" style={styles.container}>

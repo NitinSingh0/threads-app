@@ -1038,6 +1038,12 @@ app.post("/reset-password", async (req, res) => {
   console.log("Incoming Request Body:", req.body); // Debugging: Log the request body
 
   try {
+    // Validate the request data
+    if (!userId || !oldPassword || !newPassword) {
+      console.log("Missing required fields"); // Debugging: Log if required fields are missing
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
@@ -1060,12 +1066,20 @@ app.post("/reset-password", async (req, res) => {
       });
     }
 
+    // Check if the new password meets the requirements
+    if (newPassword.length < 6) {
+      console.log("New password must be at least 6 characters long"); // Debugging: Log if new password is too short
+      return res
+        .status(400)
+        .json({ message: "New password must be at least 6 characters long" });
+    }
+
     // Hash the new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     // Update the user's password
-    user.password = hashedPassword;
+    user.password = newPassword;
     await user.save();
 
     console.log("Password reset successfully"); // Debugging: Log success
