@@ -346,7 +346,7 @@ app.get("/get-posts", async (req, res) => {
   }
 });
 
-app.get("/profile/:userId", async (req, res) => {
+app.get("/profilee/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
     const user = await User.findById(userId);
