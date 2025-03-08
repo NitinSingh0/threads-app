@@ -59,7 +59,7 @@ const HomeScreen = () => {
     setModalVisible(true);
   };
   // Function to submit the report
-  const submitReport = async (postId) => {
+  const submitReport = async () => {
     if (!reportReason.trim()) {
       Alert.alert("Error", "Please provide a reason for reporting.");
       return;
@@ -133,10 +133,7 @@ const HomeScreen = () => {
     followingCount: 0,
     posts: [],
   });
-  const [commentInput, setCommentInput] = useState({
-    user: "Anonymous",
-    content: " ",
-  });
+  const [commentInput, setCommentInput] = useState({});
 
   // Fetch user ID and profile
   useEffect(() => {
@@ -417,31 +414,7 @@ const HomeScreen = () => {
                 <Text style={styles.postContent}>
                   {post.content || "No content"}
                 </Text>
-                {/* Report Modal */}
-                <Modal
-                  visible={modalVisible}
-                  //animationType="slide"
-                  transparent={true}
-                >
-                  <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                      <Text style={styles.modalTitle}>Report Post</Text>
-                      <TextInput
-                        placeholder="Enter reason..."
-                        style={styles.input}
-                        value={reportReason}
-                        onChangeText={setReportReason}
-                      />
-                      <View style={styles.buttonContainer}>
-                        <Button
-                          title="Cancel"
-                          onPress={() => setModalVisible(false)}
-                        />
-                        <Button title="Submit" onPress={submitReport} />
-                      </View>
-                    </View>
-                  </View>
-                </Modal>
+
                 <View style={styles.postActions}>
                   {/* Like/Unlike */}
                   {post.likes?.includes(userId) ? (
@@ -501,6 +474,7 @@ const HomeScreen = () => {
                         <Text>No comments yet</Text>
                       )}
                     </ScrollView>
+
                     <View style={styles.commentInputContainer}>
                       <TextInput
                         style={styles.commentInput}
@@ -548,7 +522,24 @@ const HomeScreen = () => {
           )}
         </View>
       </ScrollView>
-
+      {/* Report Modal */}
+      <Modal visible={modalVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Report Post</Text>
+            <TextInput
+              placeholder="Enter reason..."
+              style={styles.input}
+              value={reportReason}
+              onChangeText={setReportReason}
+            />
+            <View style={styles.buttonContainer}>
+              <Button title="Cancel" onPress={() => setModalVisible(false)} />
+              <Button title="Submit" onPress={submitReport} />
+            </View>
+          </View>
+        </View>
+      </Modal>
       {/* Chatbot Icon */}
       <TouchableOpacity
         style={styles.chatbotIcon}

@@ -23,6 +23,7 @@ import ForgotPasswordScreen from "./screens/ForgotPassword";
 import ResetPassword from "./screens/ResetPassword";
 import GroupChat from "./screens/GroupChat";
 import GroupList from "./screens/GroupList";
+import HelpScreen from "./screens/HelpScreen";
 
 // Add animation for stack transitions
 const StackNavigator = () => {
@@ -203,6 +204,13 @@ const StackNavigator = () => {
         <Stack.Screen
           name="Chats"
           component={ChatsScreen}
+          options={{
+            headerShown: true, // Customize the header title for this screen
+          }}
+        />
+        <Stack.Screen
+          name="Help"
+          component={HelpScreen}
           options={{
             headerShown: true, // Customize the header title for this screen
           }}

@@ -25,7 +25,7 @@ useEffect(() => {
   const fetchProfile = async () => {
     try {
       const response = await axios.get(
-        `https://campusconnect-phi.vercel.app/profile/${userId}`
+        `https://campusconnect-phi.vercel.app/profilee/${userId}`
       );
       const { user } = response.data;
       setUser(user);

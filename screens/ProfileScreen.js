@@ -26,9 +26,13 @@ const ProfileScreen = () => {
     postsCount: 0,
     followingCount: 0,
     posts: [],
+    friends: [],
+    user_type: "",
+    passingYear: "",
+    joinedDate: "",
   });
   const [posts, setPosts] = useState([]);
-  const [likeScale] = useState(new Animated.Value(1));
+
   const navigation = useNavigation();
 
   const { userId } = useContext(UserType);
@@ -37,7 +41,7 @@ const ProfileScreen = () => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get(
-          `https://campusconnect-phi.vercel.app/profile/${userId}`
+          `https://campusconnect-phi.vercel.app/profilee/${userId}`
         );
         const { user } = response.data;
         setUser(user);
@@ -46,15 +50,24 @@ const ProfileScreen = () => {
         const postsResponse = await axios.get(
           `https://campusconnect-phi.vercel.app/posts/user/${userId}`
         );
-        setPosts(postsResponse.data.posts);
-        console.log("Post ::", posts);
+        if (postsResponse.data && Array.isArray(postsResponse.data.posts)) {
+          setPosts(postsResponse.data.posts);
+        } else {
+          setPosts([]); // Ensure posts is always an array
+        }
       } catch (error) {
         console.log("Error fetching profile or posts:", error);
+        setPosts([]);
       }
     };
     fetchProfile();
   }, [userId]);
-
+  // Determine user type label
+  const currentYear = new Date().getFullYear();
+  let displayUserType = user.user_type;
+  if (user.user_type === "Student" && user.passingYear < currentYear) {
+    displayUserType = "Alumni";
+  }
   const logout = () => {
     clearAuthToken();
   };
@@ -69,6 +82,14 @@ const ProfileScreen = () => {
     <View>
       <ScrollView>
         <View style={styles.container}>
+          <View style={styles.header}>
+            <Pressable
+              onPress={() => navigation.navigate("Help")}
+              style={styles.helpIcon}
+            >
+              <Ionicons name="help-circle-outline" size={28} color="#4a90e2" />
+            </Pressable>
+          </View>
           <View style={styles.profileHeader}>
             <Image
               style={styles.coverImage}
@@ -85,7 +106,7 @@ const ProfileScreen = () => {
               />
               <Text style={styles.username}>{user?.name || "Unknown"}</Text>
               <View style={styles.collegeBadge}>
-                <Text style={styles.collegeName}>{user?.user_type}</Text>
+                <Text style={styles.collegeName}>{displayUserType}</Text>
               </View>
             </View>
           </View>
@@ -93,12 +114,16 @@ const ProfileScreen = () => {
           <View style={styles.detailsSection}>
             <View style={styles.academicInfo}>
               <Text style={styles.academicText}>Course: {user?.course}</Text>
-              <Text style={styles.academicText}>
-                Joined on {moment(user?.joinedDate).format("MMMM D, YYYY")}
-              </Text>
-              <Text style={styles.academicText}>
-                Passing Year: {user?.passingYear}
-              </Text>
+              {user.user_type === "Student" && (
+                <Text style={styles.academicText}>
+                  Passing Year: {user?.passingYear}
+                </Text>
+              )}
+              {user.user_type === "Faculty" && (
+                <Text style={styles.academicText}>
+                  Joined on {moment(user?.joinedDate).format("MMMM D, YYYY")}
+                </Text>
+              )}
             </View>
 
             <View style={styles.interestsSection}>
@@ -108,26 +133,22 @@ const ProfileScreen = () => {
             </View>
 
             <Text style={styles.followersCount}>
-              {user?.followers?.length || "5"} followers
+              {user?.friends?.length || "5"} Connections
             </Text>
           </View>
 
           <View style={styles.statsSection}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>5</Text>
-              {/* {posts.length} */}
+              <Text style={styles.statNumber}>{posts?.length || 0}</Text>
+
               <Text style={styles.statLabel}>Posts</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{10}</Text>
-              {/* user?.followers?.length */}
-              <Text style={styles.statLabel}>Followers</Text>
-            </View>
-            <View style={styles.statItem}>
               <Text style={styles.statNumber}>
-                {user?.followingCount || "10"}
+                {user?.friends?.length || 0}
               </Text>
-              <Text style={styles.statLabel}>Following</Text>
+              {/* user?.followers?.length */}
+              <Text style={styles.statLabel}>Connections</Text>
             </View>
           </View>
 
@@ -148,9 +169,6 @@ const ProfileScreen = () => {
             >
               <Text>Reset Password</Text>
             </Pressable>
-            <Pressable onPress={logout} style={styles.logoutButton}>
-              <Text>Logout</Text>
-            </Pressable>
           </View>
           <View>
             <Text
@@ -160,27 +178,32 @@ const ProfileScreen = () => {
             </Text>
           </View>
           {/* Posts */}
-          <View style={styles.postsContainer}>
-            {posts.map((post) => (
-              <View key={post._id} style={styles.postCard}>
-                <View style={styles.postHeader}>
-                  <Image
-                    style={styles.postProfileImage}
-                    source={{
-                      uri: user.profileImage,
-                    }}
-                  />
-                  <Text style={styles.postUserName}>{post.user.name}</Text>
-                </View>
-                <Text style={styles.postContent}>{post.content}</Text>
+          <View>
+            {posts && posts.length > 0 ? (
+              <View style={styles.postsContainer}>
+                {posts.map((post) => (
+                  <View key={post._id} style={styles.postCard}>
+                    <View style={styles.postHeader}>
+                      <Image
+                        style={styles.postProfileImage}
+                        source={{
+                          uri: user.profileImage,
+                        }}
+                      />
+                      <Text style={styles.postUserName}>{post.user.name}</Text>
+                    </View>
+                    <Text style={styles.postContent}>{post.content}</Text>
 
-                <Text style={styles.postFooter}>
-                  {post.likes.length} Kudos | {post.replies.length} Insights
-                </Text>
+                    <Text style={styles.postFooter}>
+                      {post.likes.length} Kudos | {post.replies.length} Insights
+                    </Text>
+                  </View>
+                ))}
               </View>
-            ))}
+            ) : (
+              <Text>No posts available</Text>
+            )}
           </View>
-
           <View style={styles.footer}>
             <Text style={styles.footerText}>Campus Connect</Text>
           </View>
@@ -230,6 +253,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: "#D0D0D0",
     borderRadius: 20,
+  },
+  header: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    zIndex: 10,
+  },
+  helpIcon: {
+    padding: 10,
   },
   collegeName: {
     fontSize: 14,
@@ -304,7 +336,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: "40%",
     alignItems: "center",
-    backgroundColor: "#6A11CB",
+    backgroundColor: "#FFF",
   },
   logoutButton: {
     padding: 12,
